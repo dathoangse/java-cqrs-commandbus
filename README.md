@@ -1,6 +1,9 @@
 # Java CQRS
 A lightweight & highly extensible CQRS framework for implementing CQRS architectural pattern in java
 
+## Who uses Java CQRS
+* [YouthDev](https://youthdev.net/en/)
+
 ## Build status
 ```
 Coming soon...
@@ -29,9 +32,9 @@ Built with:
 # Features
 `Java CQRS` is a very lightweight and highly extensible CQRS framework that help you implement the CQRS architecture into your project.
 Characteristics:
-1. Lightweight: The core interfaces of the framework is minimized. And the lib only provide a minimized implementation so that you can easily integrate into your project with little efforts.
-2. Highly extensible: The lib provide a very high extensibility via a middleware pipeline and well-structured modules / plugins.
-3. Architecturally unoptionated: The framework doesn't make any assumption about the architecture you're building, thus it doesn't force you to design your architecture in a certain architectural style. CQRS can be implemented at different levels & scales, depending on your project requirement.
+1. `Lightweight`: The core interfaces of the framework is minimized, making it easy to swap out the implementation of the whole framework, and you can easily integrate into your project with little efforts.
+2. `Highly extensible`: The lib provide a very high extensibility via a *middleware pipeline* and well-structured modules.
+3. `Architecturally unoptionated`: The framework doesn't make any assumption about the architecture you're building, thus it doesn't force you to design your architecture in a certain architectural style. CQRS can be implemented at different levels & scales, depending on your project requirement.
 So:
 * You can simply take the command bus and use it to implement your application layer to act as a bridge between your UI/presentation layer & domain layer, and simply have the read side (read models/operations) and write side (write models/operations) separated.
 * Or you can take it to the next level and have a separated read database & write database that keep in sync using event projection mechanism, which can help to make the read side massively scalable & extremely high performance.
@@ -65,4 +68,3 @@ Before creating pull request, please make sure:
 ```
 Coming soon
 ```
-
