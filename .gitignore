@@ -46,6 +46,7 @@ gradle-app.setting
 
 # Intellij IDEA
 .idea/
+java-lightweight-cqrs.iml
 
 # VS Code Plugins
 .classpath
