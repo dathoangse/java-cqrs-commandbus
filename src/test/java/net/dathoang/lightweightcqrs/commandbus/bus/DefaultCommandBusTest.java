@@ -2,8 +2,7 @@ package net.dathoang.lightweightcqrs.commandbus.bus;
 
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
-import net.dathoang.lightweightcqrs.commandbus.models.ExceptionHolder;
-import net.dathoang.lightweightcqrs.commandbus.models.ResultHolder;
+import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -70,10 +69,10 @@ class DefaultCommandBusTest {
 
       // Arrange
       doAnswer(invocation -> {
-        ExceptionHolder exceptionHolder = (ExceptionHolder)invocation.getArguments()[2];
-        exceptionHolder.setException(exceptionToRaise);
+        ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder) invocation.getArguments()[1];
+        resultAndExceptionHolder.setException(exceptionToRaise);
         return null;
-      }).when(middleware2).preHandle(eq(dummyCommand), any(), any());
+      }).when(middleware2).preHandle(eq(dummyCommand), any());
 
       // Act
       Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
@@ -93,10 +92,10 @@ class DefaultCommandBusTest {
 
       // Arrange
       doAnswer(invocation -> {
-        ResultHolder resultHolder = (ResultHolder)invocation.getArguments()[1];
-        resultHolder.setResult(resultToRaise);
+        ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder)invocation.getArguments()[1];
+        resultAndExceptionHolder.setResult(resultToRaise);
         return null;
-      }).when(middleware2).preHandle(eq(dummyCommand), any(), any());
+      }).when(middleware2).preHandle(eq(dummyCommand), any());
 
       // Act
       Object realResult = commandBus.dispatch(dummyCommand);
@@ -113,9 +112,9 @@ class DefaultCommandBusTest {
     void shouldNotShortCircuitAndRaiseExceptionWhenThereIsUnexpectedException() throws Exception {
       // Arrange
       doThrow(new RuntimeException())
-          .when(middleware1).preHandle(any(), any(), any());
+          .when(middleware1).preHandle(any(), any());
       doThrow(new RuntimeException())
-          .when(middleware2).preHandle(any(), any(), any());
+          .when(middleware2).preHandle(any(), any());
 
       // Act
       commandBus.dispatch(dummyCommand);
@@ -157,9 +156,9 @@ class DefaultCommandBusTest {
       // Arrange
       Object middlewareResult = new Object();
       doAnswer(answer -> {
-        ((ResultHolder)answer.getArguments()[1]).setResult(middlewareResult);
+        ((ResultAndExceptionHolder)answer.getArguments()[1]).setResult(middlewareResult);
         return null;
-      }).when(middleware2).postHandle(eq(dummyCommand), any(), any());
+      }).when(middleware2).postHandle(eq(dummyCommand), any());
 
       // Act
       Object commandBusResult = commandBus.dispatch(dummyCommand);
@@ -177,9 +176,9 @@ class DefaultCommandBusTest {
           .when(mockCommandHandler).handle(dummyCommand);
       doAnswer(answer -> {
         // Catch exception in the pipeline by setting exception to null in exception holder
-        ((ExceptionHolder)answer.getArguments()[2]).setException(null);
+        ((ResultAndExceptionHolder)answer.getArguments()[1]).setException(null);
         return null;
-      }).when(middleware2).postHandle(eq(dummyCommand), any(), any());
+      }).when(middleware2).postHandle(eq(dummyCommand), any());
 
       // Act
       Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
@@ -190,10 +189,8 @@ class DefaultCommandBusTest {
     }
 
     private void verifyMiddlewareCallOnce(Middleware middleware, DummyCommand command) {
-      verify(middleware, times(1))
-          .preHandle(eq(command), any(), any());
-      verify(middleware, times(1))
-          .postHandle(eq(command), any(), any());
+      verify(middleware, times(1)).preHandle(eq(command), any());
+      verify(middleware, times(1)).postHandle(eq(command), any());
     }
 
     private void verifyMiddlewareCallOnce(List<Middleware> middlewares, DummyCommand command) {
@@ -201,10 +198,8 @@ class DefaultCommandBusTest {
     }
 
     private void verifyMiddlewareNotCalled(Middleware middleware) {
-      verify(middleware, times(0))
-          .preHandle(any(), any(), any());
-      verify(middleware, times(0))
-          .postHandle(any(), any(), any());
+      verify(middleware, times(0)).preHandle(any(), any());
+      verify(middleware, times(0)).postHandle(any(), any());
     }
   }
 }
