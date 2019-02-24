@@ -2,15 +2,12 @@ package net.dathoang.lightweightcqrs.commandbus.bus;
 
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
-import net.dathoang.lightweightcqrs.commandbus.models.ExceptionHolder;
-import net.dathoang.lightweightcqrs.commandbus.models.ResultHolder;
+import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.List;
-import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DefaultCommandBus implements CommandBus {
@@ -50,16 +47,16 @@ public class DefaultCommandBus implements CommandBus {
 
   private <R> R dispatchThroughMiddlewarePipeline(Command<R> command, CommandHandler<Command<R>, R> handler) throws Exception {
     List<Middleware> processedMiddlewares = new ArrayList<>();
-    ExceptionHolder exceptionHolder = new ExceptionHolder();
-    ResultHolder<R> resultHolder = new ResultHolder<>();
+    ResultAndExceptionHolder<R> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
 
     // Pre-handle the command
     for (int i = 0; i < middlewarePipeline.size(); ++i) {
       Middleware middleware = middlewarePipeline.get(i);
       try {
         processedMiddlewares.add(middleware);
-        middleware.preHandle(command, resultHolder, exceptionHolder);
-        if (exceptionHolder.getException() != null || resultHolder.getResult() != null) {
+        middleware.preHandle(command, resultAndExceptionHolder);
+        if (resultAndExceptionHolder.getException() != null
+            || resultAndExceptionHolder.getResult() != null) {
           break;
         }
       } catch (Exception ex) {
@@ -71,16 +68,17 @@ public class DefaultCommandBus implements CommandBus {
     }
 
     // Handle the command
-    if (resultHolder.getResult() == null && exceptionHolder.getException() == null) {
+    if (resultAndExceptionHolder.getResult() == null
+        && resultAndExceptionHolder.getException() == null) {
       try {
         R result = handler.handle(command);
-        resultHolder.setResult(result);
+        resultAndExceptionHolder.setResult(result);
       } catch (Exception ex) {
         log.error(
             String.format("Exception while %s is handling %s, the exception will be passed through the bottom to top " +
                     "of the middleware pipeline", handler.getClass().getName(), command.getClass().getName()),
             ex);
-        exceptionHolder.setException(ex);
+        resultAndExceptionHolder.setException(ex);
       }
     }
 
@@ -88,7 +86,7 @@ public class DefaultCommandBus implements CommandBus {
     for (int i = processedMiddlewares.size() - 1; i >= 0; --i) {
       Middleware middleware = middlewarePipeline.get(i);
       try {
-        middleware.postHandle(command, resultHolder, exceptionHolder);
+        middleware.postHandle(command, resultAndExceptionHolder);
       } catch (Exception ex) {
         log.error(
             String.format("Exception while %s is post-handling %s, the error is intentionally bypassed",
@@ -97,9 +95,9 @@ public class DefaultCommandBus implements CommandBus {
       }
     }
 
-    if (exceptionHolder.getException() != null) {
-      throw exceptionHolder.getException();
+    if (resultAndExceptionHolder.getException() != null) {
+      throw resultAndExceptionHolder.getException();
     }
-    return resultHolder.getResult();
+    return resultAndExceptionHolder.getResult();
   }
 }
