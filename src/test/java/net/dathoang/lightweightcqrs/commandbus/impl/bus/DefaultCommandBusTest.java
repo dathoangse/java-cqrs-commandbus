@@ -1,4 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus.bus;
+package net.dathoang.lightweightcqrs.commandbus.impl.bus;
 
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
