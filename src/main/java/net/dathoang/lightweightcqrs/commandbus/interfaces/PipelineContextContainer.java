@@ -22,12 +22,12 @@ public interface PipelineContextContainer {
 
   /**
    * Set the handling data of the middleware for the current command
-   * @param middlewareData the class of the current middleware (for name-spacing)
+   * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
    * @param value the value of he data
    * @param <R> the type of the data
    */
-  <R> void setMiddlewareData(Class<? extends Middleware> middlewareData, String key, R value);
+  <R> void setMiddlewareData(Class<? extends Middleware> middlewareClass, String key, R value);
 
   /**
    * Set the context instance {@param instance} to be injected into inner middleware in the pipeline
@@ -50,9 +50,9 @@ public interface PipelineContextContainer {
    * Resolve the injected context.
    *
    * @see #bindContext(Class, Object)
-   * @param clazz the class type of the dependency
+   * @param contextClass the class type of the dependency
    * @param <R> the type of the dependency
    * @return the injected dependency
    */
-  <R> R resolveContext(Class<R> clazz);
+  <R> R resolveContext(Class<R> contextClass);
 }
