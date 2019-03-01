@@ -1,5 +1,6 @@
 package net.dathoang.lightweightcqrs.commandbus.impl.bus;
 
+import net.dathoang.lightweightcqrs.commandbus.annotations.MiddlewareContext;
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
 import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static net.dathoang.lightweightcqrs.commandbus.impl.utils.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
@@ -188,6 +190,56 @@ class DefaultCommandBusTest {
           .describedAs("Command bus should not throw exception");
     }
 
+    @Test
+    @DisplayName("should inject middleware context successfully into inner middlewares and command handler")
+    void shouldInjectMiddlewareContextSuccessfullyIntoInnerMiddlewaresAndCommandHandler()
+        throws Exception {
+      // Arrange
+      MiddlewareContextA contextAToInject = new MiddlewareContextA();
+      MiddlewareContextB contextBToInject = new MiddlewareContextB();
+      MiddlewareA middlewareA = spy(new MiddlewareA(contextAToInject));
+      MiddlewareB middlewareB = spy(new MiddlewareB(contextBToInject));
+      MiddlewareC middlewareC = spy(new MiddlewareC());
+      commandBus.getMiddlewarePipeline().clear();
+      commandBus.getMiddlewarePipeline().addAll(asList(
+          middlewareA,
+          middlewareB,
+          middlewareC
+      ));
+      DummyInjectedCommandHandler commandHandler = spy(new DummyInjectedCommandHandler());
+      DummyCommand dummyCommand = new DummyCommand();
+      CommandHandlerFactory handlerFactory = mock(CommandHandlerFactory.class);
+      doReturn(commandHandler)
+          .when(handlerFactory).createHandler(dummyCommand.getClass().getName());
+      commandBus.setHandlerFactory(handlerFactory);
+
+      // Act
+      commandBus.dispatch(new DummyCommand());
+
+      // Assert
+      assertThat(getDeclaredFieldValue(middlewareA, "contextContainer"))
+          .isNotNull();
+
+      assertThat(getDeclaredFieldValue(middlewareB, "contextContainer"))
+          .isNotNull();
+      assertThat(getDeclaredFieldValue(middlewareB, "contextA"))
+          .isEqualTo(contextAToInject);
+
+      assertThat(getDeclaredFieldValue(middlewareC, "contextA"))
+          .isEqualTo(contextAToInject);
+      assertThat(getDeclaredFieldValue(middlewareC, "contextB"))
+          .isEqualTo(contextBToInject);
+      verify(middlewareC, times(1))
+          .setUpDependency(contextAToInject, contextBToInject);
+
+      assertThat(getDeclaredFieldValue(commandHandler, "contextA"))
+          .isEqualTo(contextAToInject);
+      assertThat(getDeclaredFieldValue(commandHandler, "contextB"))
+          .isEqualTo(contextBToInject);
+      verify(commandHandler, times(1))
+          .setUpDependency(contextAToInject, contextBToInject);
+    }
+
     private void verifyMiddlewareCallOnce(Middleware middleware, DummyCommand command) {
       verify(middleware, times(1)).preHandle(eq(command), any());
       verify(middleware, times(1)).postHandle(eq(command), any());
@@ -207,3 +259,89 @@ class DefaultCommandBusTest {
 class DummyCommand implements Command<Object> {}
 
 abstract class DummyCommandHandler implements CommandHandler<DummyCommand, Object> { }
+
+class MiddlewareA implements Middleware {
+  @MiddlewareContext
+  private PipelineContextContainer contextContainer;
+  private MiddlewareContextA contextAToInject;
+
+  public MiddlewareA(
+      MiddlewareContextA contextAToInject) {
+    this.contextAToInject = contextAToInject;
+  }
+
+  @Override
+  public <R> void preHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    contextContainer.bindContext(MiddlewareContextA.class, contextAToInject);
+  }
+
+  @Override
+  public <R> void postHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+  }
+}
+
+class MiddlewareB implements Middleware {
+  @MiddlewareContext
+  private PipelineContextContainer contextContainer;
+  @MiddlewareContext
+  private MiddlewareContextA contextA;
+  private MiddlewareContextB contextBToInject;
+
+  public MiddlewareB(MiddlewareContextB contextBToInject) {
+    this.contextBToInject = contextBToInject;
+  }
+
+  @Override
+  public <R> void preHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    contextContainer.bindContext(MiddlewareContextB.class, contextBToInject);
+  }
+
+  @Override
+  public <R> void postHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+  }
+}
+
+class MiddlewareC implements Middleware {
+  @MiddlewareContext
+  private MiddlewareContextA contextA;
+  @MiddlewareContext
+  private MiddlewareContextB contextB;
+  @MiddlewareContext
+  protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
+
+  }
+
+  @Override
+  public <R> void preHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+  }
+
+  @Override
+  public <R> void postHandle(Command<R> command,
+      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+  }
+}
+
+class DummyInjectedCommandHandler implements CommandHandler<DummyCommand, Object> {
+  @MiddlewareContext
+  private MiddlewareContextA contextA;
+  @MiddlewareContext
+  private MiddlewareContextB contextB;
+  @MiddlewareContext
+  protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
+
+  }
+
+  @Override
+  public Void handle(DummyCommand command) throws Exception {
+    return null;
+  }
+}
+
+class MiddlewareContextA {}
+
+class MiddlewareContextB {}

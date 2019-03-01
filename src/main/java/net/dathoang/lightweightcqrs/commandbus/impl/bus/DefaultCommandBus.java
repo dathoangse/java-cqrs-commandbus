@@ -1,5 +1,7 @@
 package net.dathoang.lightweightcqrs.commandbus.impl.bus;
 
+import static net.dathoang.lightweightcqrs.commandbus.impl.utils.ExceptionUtils.callSafely;
+
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
 import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
@@ -48,10 +50,13 @@ public class DefaultCommandBus implements CommandBus {
   private <R> R dispatchThroughMiddlewarePipeline(Command<R> command, CommandHandler<Command<R>, R> handler) throws Exception {
     List<Middleware> processedMiddlewares = new ArrayList<>();
     ResultAndExceptionHolder<R> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
+    PipelineContextContainer contextContainer = new DefaultPipelineContextContainer();
 
     // Pre-handle the command
     for (int i = 0; i < middlewarePipeline.size(); ++i) {
       Middleware middleware = middlewarePipeline.get(i);
+      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, middleware),
+          String.format("Error while injecting contexts into middleware %s", middleware.getClass().getName()));
       try {
         processedMiddlewares.add(middleware);
         middleware.preHandle(command, resultAndExceptionHolder);
@@ -70,6 +75,8 @@ public class DefaultCommandBus implements CommandBus {
     // Handle the command
     if (resultAndExceptionHolder.getResult() == null
         && resultAndExceptionHolder.getException() == null) {
+      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, handler),
+          String.format("Error while injecting contexts into handler %s", handler.getClass().getName()));
       try {
         R result = handler.handle(command);
         resultAndExceptionHolder.setResult(result);
