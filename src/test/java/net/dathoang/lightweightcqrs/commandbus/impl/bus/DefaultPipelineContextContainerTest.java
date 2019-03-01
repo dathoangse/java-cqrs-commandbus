@@ -1,9 +1,7 @@
 package net.dathoang.lightweightcqrs.commandbus.impl.bus;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
-import com.sun.xml.internal.ws.api.streaming.XMLStreamReaderFactory.Default;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.Command;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.Middleware;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.PipelineContextContainer;
