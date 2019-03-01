@@ -40,12 +40,12 @@ class ReflectionUtilsTest {
       // Assert
       assertThat(fields.stream().map(it -> it.getName()))
           .containsExactlyInAnyOrder(
-              "dummyFieldA1",
-              "dummyFieldA3",
-              "dummyFieldA5",
-              "dummyFieldB1",
-              "dummyFieldB3",
-              "dummyFieldB5"
+              "privateAnnotatedFieldA",
+              "protectedAnnotatedFieldA",
+              "publicAnnotatedFieldA",
+              "privateAnnotatedFieldB",
+              "protectedAnnotatedFieldB",
+              "publicAnnotatedFieldB"
           );
     }
   }
@@ -62,12 +62,12 @@ class ReflectionUtilsTest {
       // Assert
       assertThat(methods.stream().map(it -> it.getName()))
           .containsExactlyInAnyOrder(
-              "dummyMethodA1",
-              "dummyMethodA3",
-              "dummyMethodA5",
-              "dummyMethodB1",
-              "dummyMethodB3",
-              "dummyMethodB5"
+              "privateAnnotatedMethodA",
+              "protectedAnnotatedMethodA",
+              "publicAnnotatedMethodA",
+              "privateAnnotatedMethodB",
+              "protectedAnnotatedMethodB",
+              "publicAnnotatedMethodB"
           );
     }
   }
@@ -83,65 +83,65 @@ class ReflectionUtilsTest {
 
 class DummyClassA {
   @DummyAnnotation
-  private Object dummyFieldA1;
-  private Object dummyFieldA2;
+  private Object privateAnnotatedFieldA;
+  private Object privateFieldA;
 
   @DummyAnnotation
-  protected Object dummyFieldA3;
-  protected Object dummyFieldA4;
+  protected Object protectedAnnotatedFieldA;
+  protected Object protectedFieldA;
 
   @DummyAnnotation
-  public Object dummyFieldA5;
-  public Object dummyFieldA6;
+  public Object publicAnnotatedFieldA;
+  public Object publicFieldA;
 
   @AnotherDummyAnnotation
-  public Object dummyFieldA7;
+  public Object publicFieldAWithAnotherAnnotation;
 
   @DummyAnnotation
-  private void dummyMethodA1() {}
-  private void dummyMethodA2() {}
+  private void privateAnnotatedMethodA() {}
+  private void privateMethodA() {}
 
   @DummyAnnotation
-  protected void dummyMethodA3() {}
-  protected void dummyMethodA4() {}
+  protected void protectedAnnotatedMethodA() {}
+  protected void protectedMethodA() {}
 
   @DummyAnnotation
-  public void dummyMethodA5() {}
-  public void dummyMethodA6() {}
+  public void publicAnnotatedMethodA() {}
+  public void publicMethodA() {}
 
   @AnotherDummyAnnotation
-  public void dummyMethodA7() {}
+  public void publicMethodAWithAnotherAnnotation() {}
 }
 
 class DummyClassB extends DummyClassA {
   @DummyAnnotation
-  private Object dummyFieldB1;
-  private Object dummyFieldB2;
+  private Object privateAnnotatedFieldB;
+  private Object privateFieldB;
 
   @DummyAnnotation
-  protected Object dummyFieldB3;
-  protected Object dummyFieldB4;
+  protected Object protectedAnnotatedFieldB;
+  protected Object protectedFieldB;
 
   @DummyAnnotation
-  public Object dummyFieldB5;
-  public Object dummyFieldB6;
+  public Object publicAnnotatedFieldB;
+  public Object publicFieldB;
 
   @AnotherDummyAnnotation
-  public Object dummyFieldB7;
+  public Object publicFieldBWithAnotherAnnotation;
 
   @DummyAnnotation
-  private void dummyMethodB1() {}
-  private void dummyMethodB2() {}
+  private void privateAnnotatedMethodB() {}
+  private void privateMethodB() {}
 
   @DummyAnnotation
-  protected void dummyMethodB3() {}
-  protected void dummyMethodB4() {}
+  protected void protectedAnnotatedMethodB() {}
+  protected void protectedMethodB() {}
 
   @DummyAnnotation
-  public void dummyMethodB5() {}
-  public void dummyMethodB6() {}
+  public void publicAnnotatedMethodB() {}
+  public void publicMethodB() {}
 
   @AnotherDummyAnnotation
-  public void dummyMethodB7() {}
+  public void publicMethodBWithAnotherAnnotation() {}
 }
 

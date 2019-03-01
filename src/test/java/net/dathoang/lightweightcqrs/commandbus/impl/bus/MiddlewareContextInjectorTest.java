@@ -3,7 +3,6 @@ package net.dathoang.lightweightcqrs.commandbus.impl.bus;
 import static java.util.Arrays.asList;
 import static net.dathoang.lightweightcqrs.commandbus.impl.utils.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -15,7 +14,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import net.dathoang.lightweightcqrs.commandbus.annotations.MiddlewareContext;
 import net.dathoang.lightweightcqrs.commandbus.interfaces.PipelineContextContainer;
@@ -28,8 +26,12 @@ import org.mockito.Mockito;
 class MiddlewareContextInjectorTest {
   private DummyType dummyContext;
   private PipelineContextContainer contextContainer;
-  private static final List<String> annotatedFieldNames = asList("dummyFieldA1", "dummyFieldA3", "dummyFieldA5", "dummyFieldB1", "dummyFieldB3", "dummyFieldB5");
-  private static final List<String> nonContextFieldNames = asList("dummyFieldA2", "dummyFieldA4", "dummyFieldA6", "dummyFieldA7", "dummyFieldB2", "dummyFieldB4", "dummyFieldB6", "dummyFieldB7");
+  private static final List<String> annotatedFieldNames = asList(
+      "privateAnnotatedFieldA", "protectedAnnotatedFieldA", "publicAnnotatedFieldA",
+      "privateAnnotatedFieldB", "protectedAnnotatedFieldB", "publicAnnotatedFieldB");
+  private static final List<String> nonContextFieldNames = asList(
+      "privateFieldA", "protectedFieldA", "publicFieldA", "publicFieldAWithAnotherAnnotation",
+      "privateFieldB", "protectedFieldB", "publicFieldB", "publicFieldBWithAnotherAnnotation");
 
   @BeforeEach
   void setUp() {
@@ -100,38 +102,38 @@ class MiddlewareContextInjectorTest {
 
   private static void verifyAnnotatedMethodsCalled(DummyClassB injectingObject, DummyType context) {
     verify(injectingObject, Mockito.times(1))
-        .onDummyMethodA1Called(context);
+        .onPrivateAnnotatedMethodACalled(context);
     verify(injectingObject, Mockito.times(1))
-        .dummyMethodA3(context);
+        .protectedAnnotatedMethodA(context);
     verify(injectingObject, Mockito.times(1))
-        .dummyMethodA5(context);
+        .publicAnnotatedMethodA(context);
 
     verify(injectingObject, Mockito.times(1))
-        .onDummyMethodB1Called(context);
+        .onPrivateAnnotatedMethodBCalled(context);
     verify(injectingObject, Mockito.times(1))
-        .dummyMethodB3(context);
+        .protectedAnnotatedMethodB(context);
     verify(injectingObject, Mockito.times(1))
-        .dummyMethodB5(context);
+        .publicAnnotatedMethodB(context);
   }
 
   private static void verifyNonAnnotatedMethodsNotCalled(DummyClassB injectingObject, DummyType context) {
     verify(injectingObject, Mockito.times(0))
-        .onDummyMethodA2Called(any());
+        .onPrivateMethodACalled(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodA4(any());
+        .protectedMethodA(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodA6(any());
+        .publicMethodA(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodA7(context);
+        .publicMethodAWithAnotherAnnotation(context);
 
     verify(injectingObject, Mockito.times(0))
-        .onDummyMethodB2Called(any());
+        .onPrivateMethodBCalled(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodB4(any());
+        .protectedMethodB(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodB6(any());
+        .publicMethodB(any());
     verify(injectingObject, Mockito.times(0))
-        .dummyMethodB7(context);
+        .publicMethodBWithAnotherAnnotation(context);
   }
 
   private static <R> List<R> duplicateList(R value, int size) {
@@ -165,97 +167,97 @@ class MiddlewareContextInjectorTest {
 
 class DummyClassA {
   @MiddlewareContext
-  private DummyType dummyFieldA1;
-  private DummyType dummyFieldA2;
+  private DummyType privateAnnotatedFieldA;
+  private DummyType privateFieldA;
 
   @MiddlewareContext
-  protected DummyType dummyFieldA3;
-  protected DummyType dummyFieldA4;
+  protected DummyType protectedAnnotatedFieldA;
+  protected DummyType protectedFieldA;
 
   @MiddlewareContext
-  public DummyType dummyFieldA5;
-  public DummyType dummyFieldA6;
+  public DummyType publicAnnotatedFieldA;
+  public DummyType publicFieldA;
 
   @DummyAnnotation
-  public DummyType dummyFieldA7;
+  public DummyType publicFieldAWithAnotherAnnotation;
 
   public DummyClassA() {}
 
   public DummyClassA(DummyType annotatedFieldValue, DummyType nonAnnotatedFieldValue) {
-    dummyFieldA1 = dummyFieldA3 = dummyFieldA5 = annotatedFieldValue;
-    dummyFieldA2 = dummyFieldA4 = dummyFieldA6 = dummyFieldA7 = nonAnnotatedFieldValue;
+    privateAnnotatedFieldA = protectedAnnotatedFieldA = publicAnnotatedFieldA = annotatedFieldValue;
+    privateFieldA = protectedFieldA = publicFieldA = publicFieldAWithAnotherAnnotation = nonAnnotatedFieldValue;
   }
 
   @MiddlewareContext
-  private void dummyMethodA1(DummyType context) {
-    onDummyMethodA1Called(context);
+  private void privateAnnotatedMethodA(DummyType context) {
+    onPrivateAnnotatedMethodACalled(context);
   }
-  private void dummyMethodA2(DummyType context) {
-    onDummyMethodA2Called(context);
+  private void privateMethodA(DummyType context) {
+    onPrivateMethodACalled(context);
   }
 
   @MiddlewareContext
-  protected void dummyMethodA3(DummyType context) {}
-  protected void dummyMethodA4(DummyType context) {}
+  protected void protectedAnnotatedMethodA(DummyType context) {}
+  protected void protectedMethodA(DummyType context) {}
 
   @MiddlewareContext
-  public void dummyMethodA5(DummyType context) {}
-  public void dummyMethodA6(DummyType context) {}
+  public void publicAnnotatedMethodA(DummyType context) {}
+  public void publicMethodA(DummyType context) {}
 
   @DummyAnnotation
-  public void dummyMethodA7(DummyType context) {}
+  public void publicMethodAWithAnotherAnnotation(DummyType context) {}
 
-  protected void onDummyMethodA1Called(DummyType context) {}
+  protected void onPrivateAnnotatedMethodACalled(DummyType context) {}
 
-  protected void onDummyMethodA2Called(DummyType context) {}
+  protected void onPrivateMethodACalled(DummyType context) {}
 }
 
 class DummyClassB extends DummyClassA {
   @MiddlewareContext
-  private DummyType dummyFieldB1;
-  private DummyType dummyFieldB2;
+  private DummyType privateAnnotatedFieldB;
+  private DummyType privateFieldB;
 
   @MiddlewareContext
-  protected DummyType dummyFieldB3;
-  protected DummyType dummyFieldB4;
+  protected DummyType protectedAnnotatedFieldB;
+  protected DummyType protectedFieldB;
 
   @MiddlewareContext
-  public DummyType dummyFieldB5;
-  public DummyType dummyFieldB6;
+  public DummyType publicAnnotatedFieldB;
+  public DummyType publicFieldB;
 
   @DummyAnnotation
-  public DummyType dummyFieldB7;
+  public DummyType publicFieldBWithAnotherAnnotation;
 
   public DummyClassB() {}
 
   public DummyClassB(DummyType annotatedFieldValue, DummyType nonAnnotatedFieldValue) {
     super(annotatedFieldValue, nonAnnotatedFieldValue);
-    dummyFieldB1 = dummyFieldB3 = dummyFieldB5 = annotatedFieldValue;
-    dummyFieldB2 = dummyFieldB4 = dummyFieldB6 = dummyFieldB7 = nonAnnotatedFieldValue;
+    privateAnnotatedFieldB = protectedAnnotatedFieldB = publicAnnotatedFieldB = annotatedFieldValue;
+    privateFieldB = protectedFieldB = publicFieldB = publicFieldBWithAnotherAnnotation = nonAnnotatedFieldValue;
   }
 
   @MiddlewareContext
-  private void dummyMethodB1(DummyType context) {
-    onDummyMethodB1Called(context); // For verify calls when testing
+  private void privateAnnotatedMethodB(DummyType context) {
+    onPrivateAnnotatedMethodBCalled(context); // For verify calls when testing
   }
-  private void dummyMethodB2(DummyType context) {
-    onDummyMethodB2Called(context); // For verify calls when testing
+  private void privateMethodB(DummyType context) {
+    onPrivateMethodBCalled(context); // For verify calls when testing
   }
 
   @MiddlewareContext
-  protected void dummyMethodB3(DummyType context) {}
-  protected void dummyMethodB4(DummyType context) {}
+  protected void protectedAnnotatedMethodB(DummyType context) {}
+  protected void protectedMethodB(DummyType context) {}
 
   @MiddlewareContext
-  public void dummyMethodB5(DummyType context) {}
-  public void dummyMethodB6(DummyType context) {}
+  public void publicAnnotatedMethodB(DummyType context) {}
+  public void publicMethodB(DummyType context) {}
 
   @DummyAnnotation
-  public void dummyMethodB7(DummyType context) {}
+  public void publicMethodBWithAnotherAnnotation(DummyType context) {}
 
-  protected void onDummyMethodB1Called(DummyType context) {}
+  protected void onPrivateAnnotatedMethodBCalled(DummyType context) {}
 
-  protected void onDummyMethodB2Called(DummyType context) {}
+  protected void onPrivateMethodBCalled(DummyType context) {}
 }
 
 class DummyType {}
