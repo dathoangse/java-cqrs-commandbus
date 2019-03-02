@@ -1,10 +1,8 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.bus;
+package net.dathoang.lightweightcqrs.commandbus;
 
-import static net.dathoang.lightweightcqrs.commandbus.impl.utils.ExceptionUtils.callSafely;
+import static net.dathoang.lightweightcqrs.commandbus.ExceptionUtils.callSafely;
 
 import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.*;
-import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -12,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class DefaultCommandBus implements CommandBus {
+final class DefaultCommandBus implements CommandBus {
   private static final Log log = LogFactory.getLog(DefaultCommandBus.class);
 
   private final List<Middleware> middlewarePipeline = new CopyOnWriteArrayList<>();

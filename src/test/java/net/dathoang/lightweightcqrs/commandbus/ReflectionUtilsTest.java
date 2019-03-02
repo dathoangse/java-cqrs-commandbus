@@ -1,7 +1,6 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.utils;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
 import java.lang.annotation.ElementType;
@@ -11,7 +10,6 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.List;
-import net.dathoang.lightweightcqrs.commandbus.annotations.MiddlewareContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,7 +33,8 @@ class ReflectionUtilsTest {
     @DisplayName("should return the class's and superclass's all annotated fields (including public, protected, private)")
     void shouldReturnTheClassAndSuperClassAllAnnotatedFields() {
       // Act
-      List<Field> fields = ReflectionUtils.getAllDeclaredFieldsAnnotatedWith(dummyClassB.getClass(), DummyAnnotation.class);
+      List<Field> fields = ReflectionUtils
+          .getAllDeclaredFieldsAnnotatedWith(dummyClassB.getClass(), DummyAnnotation.class);
 
       // Assert
       assertThat(fields.stream().map(it -> it.getName()))
@@ -72,76 +71,79 @@ class ReflectionUtilsTest {
     }
   }
 
-  // TODO: Test getDeclaredFieldValue
+  // region Dummy classes for testing
+  @Target({ ElementType.METHOD, ElementType.FIELD })
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface DummyAnnotation {}
+
+  @interface AnotherDummyAnnotation {}
+
+  class DummyClassA {
+    @DummyAnnotation
+    private Object privateAnnotatedFieldA;
+    private Object privateFieldA;
+
+    @DummyAnnotation
+    protected Object protectedAnnotatedFieldA;
+    protected Object protectedFieldA;
+
+    @DummyAnnotation
+    public Object publicAnnotatedFieldA;
+    public Object publicFieldA;
+
+    @AnotherDummyAnnotation
+    public Object publicFieldAWithAnotherAnnotation;
+
+    @DummyAnnotation
+    private void privateAnnotatedMethodA() {}
+    private void privateMethodA() {}
+
+    @DummyAnnotation
+    protected void protectedAnnotatedMethodA() {}
+    protected void protectedMethodA() {}
+
+    @DummyAnnotation
+    public void publicAnnotatedMethodA() {}
+    public void publicMethodA() {}
+
+    @AnotherDummyAnnotation
+    public void publicMethodAWithAnotherAnnotation() {}
+  }
+
+  class DummyClassB extends DummyClassA {
+    @DummyAnnotation
+    private Object privateAnnotatedFieldB;
+    private Object privateFieldB;
+
+    @DummyAnnotation
+    protected Object protectedAnnotatedFieldB;
+    protected Object protectedFieldB;
+
+    @DummyAnnotation
+    public Object publicAnnotatedFieldB;
+    public Object publicFieldB;
+
+    @AnotherDummyAnnotation
+    public Object publicFieldBWithAnotherAnnotation;
+
+    @DummyAnnotation
+    private void privateAnnotatedMethodB() {}
+    private void privateMethodB() {}
+
+    @DummyAnnotation
+    protected void protectedAnnotatedMethodB() {}
+    protected void protectedMethodB() {}
+
+    @DummyAnnotation
+    public void publicAnnotatedMethodB() {}
+    public void publicMethodB() {}
+
+    @AnotherDummyAnnotation
+    public void publicMethodBWithAnotherAnnotation() {}
+    
+    // endregion
+  }
 }
 
-@Target({ ElementType.METHOD, ElementType.FIELD })
-@Retention(RetentionPolicy.RUNTIME)
-@interface DummyAnnotation {}
 
-@interface AnotherDummyAnnotation {}
-
-class DummyClassA {
-  @DummyAnnotation
-  private Object privateAnnotatedFieldA;
-  private Object privateFieldA;
-
-  @DummyAnnotation
-  protected Object protectedAnnotatedFieldA;
-  protected Object protectedFieldA;
-
-  @DummyAnnotation
-  public Object publicAnnotatedFieldA;
-  public Object publicFieldA;
-
-  @AnotherDummyAnnotation
-  public Object publicFieldAWithAnotherAnnotation;
-
-  @DummyAnnotation
-  private void privateAnnotatedMethodA() {}
-  private void privateMethodA() {}
-
-  @DummyAnnotation
-  protected void protectedAnnotatedMethodA() {}
-  protected void protectedMethodA() {}
-
-  @DummyAnnotation
-  public void publicAnnotatedMethodA() {}
-  public void publicMethodA() {}
-
-  @AnotherDummyAnnotation
-  public void publicMethodAWithAnotherAnnotation() {}
-}
-
-class DummyClassB extends DummyClassA {
-  @DummyAnnotation
-  private Object privateAnnotatedFieldB;
-  private Object privateFieldB;
-
-  @DummyAnnotation
-  protected Object protectedAnnotatedFieldB;
-  protected Object protectedFieldB;
-
-  @DummyAnnotation
-  public Object publicAnnotatedFieldB;
-  public Object publicFieldB;
-
-  @AnotherDummyAnnotation
-  public Object publicFieldBWithAnotherAnnotation;
-
-  @DummyAnnotation
-  private void privateAnnotatedMethodB() {}
-  private void privateMethodB() {}
-
-  @DummyAnnotation
-  protected void protectedAnnotatedMethodB() {}
-  protected void protectedMethodB() {}
-
-  @DummyAnnotation
-  public void publicAnnotatedMethodB() {}
-  public void publicMethodB() {}
-
-  @AnotherDummyAnnotation
-  public void publicMethodBWithAnotherAnnotation() {}
-}
 

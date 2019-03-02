@@ -1,6 +1,6 @@
-package net.dathoang.lightweightcqrs.commandbus.models;
+package net.dathoang.lightweightcqrs.commandbus;
 
-public class ResultAndExceptionHolder<R> {
+public final class ResultAndExceptionHolder<R> {
   private Exception exception;
   private R result;
 

@@ -1,15 +1,14 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.utils;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ReflectionUtils {
+final class ReflectionUtils {
   private static final Log log = LogFactory.getLog(ReflectionUtils.class);
 
   private ReflectionUtils() {}

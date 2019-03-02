@@ -1,4 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus.annotations;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

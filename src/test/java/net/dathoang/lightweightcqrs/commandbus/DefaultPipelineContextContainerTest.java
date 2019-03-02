@@ -1,11 +1,7 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.bus;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import net.dathoang.lightweightcqrs.commandbus.interfaces.Command;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.Middleware;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.PipelineContextContainer;
-import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -53,24 +49,26 @@ class DefaultPipelineContextContainerTest {
           .isEqualTo(dummyContext);
     }
   }
-}
 
-class DummyMiddleware implements Middleware {
+  // region Dummy classes for testing
+  class DummyMiddleware implements Middleware {
 
-  @Override
-  public <R> void preHandle(Command<R> command,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    @Override
+    public <R> void preHandle(Command<R> command,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
 
+    }
+
+    @Override
+    public <R> void postHandle(Command<R> command,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+
+    }
   }
 
-  @Override
-  public <R> void postHandle(Command<R> command,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+  interface DummyContextInterface {}
 
-  }
+  class DummyContext implements DummyContextInterface {}
+  // endregion
 }
-
-interface DummyContextInterface {}
-
-class DummyContext implements DummyContextInterface {}
 

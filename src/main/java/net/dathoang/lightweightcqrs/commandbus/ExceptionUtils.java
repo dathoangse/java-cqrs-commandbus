@@ -1,14 +1,16 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.utils;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import java.util.concurrent.Callable;
-import java.util.function.Function;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ExceptionUtils {
+final class ExceptionUtils {
+
+  private ExceptionUtils() {}
+
   private static final Log log = LogFactory.getLog(ExceptionUtils.class);
 
-  public static <R> R callSafely(Callable<R> function, String errorMessage) {
+  static <R> R callSafely(Callable<R> function, String errorMessage) {
     try {
       return function.call();
     } catch (Exception ex) {
@@ -17,7 +19,7 @@ public class ExceptionUtils {
     }
   }
 
-  public static void callSafely(Runnable function, String errorMessage) {
+  static void callSafely(Runnable function, String errorMessage) {
     try {
       function.run();
     } catch (Exception ex) {

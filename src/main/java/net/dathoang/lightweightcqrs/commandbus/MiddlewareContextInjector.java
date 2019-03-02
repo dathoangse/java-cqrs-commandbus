@@ -1,19 +1,13 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.bus;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import net.dathoang.lightweightcqrs.commandbus.annotations.MiddlewareContext;
-import net.dathoang.lightweightcqrs.commandbus.impl.utils.ReflectionUtils;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.PipelineContextContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class MiddlewareContextInjector {
+final class MiddlewareContextInjector {
   private static final Log log = LogFactory.getLog(MiddlewareContextInjector.class);
 
   private MiddlewareContextInjector() {}

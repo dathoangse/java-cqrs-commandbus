@@ -1,6 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus.interfaces;
-
-import net.dathoang.lightweightcqrs.commandbus.annotations.MiddlewareContext;
+package net.dathoang.lightweightcqrs.commandbus;
 
 /**
  * {@link PipelineContextContainer} is used to store:

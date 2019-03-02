@@ -1,11 +1,11 @@
-package net.dathoang.lightweightcqrs.commandbus.impl.bus;
+package net.dathoang.lightweightcqrs.commandbus;
 
 import java.util.HashMap;
 import java.util.Map;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.Middleware;
-import net.dathoang.lightweightcqrs.commandbus.interfaces.PipelineContextContainer;
+import net.dathoang.lightweightcqrs.commandbus.Middleware;
+import net.dathoang.lightweightcqrs.commandbus.PipelineContextContainer;
 
-public class DefaultPipelineContextContainer implements PipelineContextContainer {
+final class DefaultPipelineContextContainer implements PipelineContextContainer {
   private Map<String, Object> middlewareDataMap = new HashMap<>();
   private Map<String, Object> contextMap = new HashMap<>();
 

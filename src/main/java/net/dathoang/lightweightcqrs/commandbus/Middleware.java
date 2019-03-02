@@ -1,6 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus.interfaces;
-
-import net.dathoang.lightweightcqrs.commandbus.models.ResultAndExceptionHolder;
+package net.dathoang.lightweightcqrs.commandbus;
 
 public interface Middleware {
   <R> void preHandle(Command<R> command, ResultAndExceptionHolder<R> resultAndExceptionHolder);
