@@ -13,8 +13,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
 final class DefaultMessageBus implements MessageBus {
   private static final Log log = LogFactory.getLog(DefaultMessageBus.class);
 
-  private final List<Middleware> middlewarePipeline = new CopyOnWriteArrayList<>();
+  private final List<Middleware> middlewarePipeline;
   private MessageHandlerFactory messageHandlerFactory;
+
+  DefaultMessageBus(MessageHandlerFactory handlerFactory, List<Middleware> middlewareList) {
+    messageHandlerFactory = handlerFactory;
+    middlewarePipeline = new ArrayList<>(middlewareList);
+  }
 
   /**
    * Find a {@link MessageHandler} that can handle this {@link Message} and dispatch it to the handler
@@ -34,18 +39,6 @@ final class DefaultMessageBus implements MessageBus {
       throw new NoHandlerFoundException(message.getClass());
     }
     return dispatchThroughMiddlewarePipeline(message, messageHandler);
-  }
-
-  public List<Middleware> getMiddlewarePipeline() {
-    return middlewarePipeline;
-  }
-
-  public MessageHandlerFactory getMessageHandlerFactory() {
-    return messageHandlerFactory;
-  }
-
-  public void setMessageHandlerFactory(MessageHandlerFactory messageHandlerFactory) {
-    this.messageHandlerFactory = messageHandlerFactory;
   }
 
   private <R> R dispatchThroughMiddlewarePipeline(Message<R> message, MessageHandler<Message<R>, R> messageHandler) throws Exception {

@@ -1,5 +1,5 @@
 package net.dathoang.cqrs.commandbus;
 
-interface MessageHandler<C extends Message<R>, R> {
-  R handle(C command) throws Exception;
+interface MessageHandler<T extends Message<R>, R> {
+  R handle(T message) throws Exception;
 }
