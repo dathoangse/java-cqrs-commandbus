@@ -54,13 +54,13 @@ class DefaultPipelineContextContainerTest {
   class DummyMiddleware implements Middleware {
 
     @Override
-    public <R> void preHandle(Command<R> command,
+    public <R> void preHandle(Message<R> message,
         ResultAndExceptionHolder<R> resultAndExceptionHolder) {
 
     }
 
     @Override
-    public <R> void postHandle(Command<R> command,
+    public <R> void postHandle(Message<R> message,
         ResultAndExceptionHolder<R> resultAndExceptionHolder) {
 
     }
