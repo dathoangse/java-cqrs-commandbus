@@ -1,8 +1,8 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
-import static net.dathoang.lightweightcqrs.commandbus.ExceptionUtils.callSafely;
+import static net.dathoang.cqrs.commandbus.ExceptionUtils.callSafely;
 
-import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
+import net.dathoang.cqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -1,4 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
 public interface Middleware {
   <R> void preHandle(Command<R> command, ResultAndExceptionHolder<R> resultAndExceptionHolder);

@@ -1,7 +1,7 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.lightweightcqrs.commandbus.ReflectionUtils.getDeclaredFieldValue;
+import static net.dathoang.cqrs.commandbus.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;

@@ -1,6 +1,6 @@
-package net.dathoang.lightweightcqrs.commandbus.exceptions;
+package net.dathoang.cqrs.commandbus.exceptions;
 
-import net.dathoang.lightweightcqrs.commandbus.Command;
+import net.dathoang.cqrs.commandbus.Command;
 
 public class NoCommandHandlerFoundException extends RuntimeException {
   public NoCommandHandlerFoundException(Class<? extends Command> commandClass) {

@@ -1,4 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

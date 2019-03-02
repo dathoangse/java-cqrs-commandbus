@@ -1,4 +1,4 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
 import java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;

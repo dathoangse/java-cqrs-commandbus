@@ -1,6 +1,6 @@
-package net.dathoang.lightweightcqrs.commandbus;
+package net.dathoang.cqrs.commandbus;
 
-import net.dathoang.lightweightcqrs.commandbus.exceptions.NoCommandHandlerFoundException;
+import net.dathoang.cqrs.commandbus.exceptions.NoCommandHandlerFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.lightweightcqrs.commandbus.ReflectionUtils.getDeclaredFieldValue;
+import static net.dathoang.cqrs.commandbus.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
