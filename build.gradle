@@ -12,24 +12,5 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
-}
-
-test {
-    useJUnitPlatform()
-    failFast = false
-
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-
-    afterSuite { desc, result ->
-        if (!desc.parent) {
-            println "\nTest result: ${result.resultType}"
-            println "Test summary: ${result.testCount} total tests run, " +
-                    "${result.successfulTestCount} succeeded, " +
-                    "${result.failedTestCount} failed, " +
-                    "${result.skippedTestCount} skipped"
-        }
-    }
+    jcenter()
 }
