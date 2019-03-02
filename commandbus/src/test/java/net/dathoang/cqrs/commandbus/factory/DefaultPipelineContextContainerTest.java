@@ -1,7 +1,11 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.factory;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
+import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
+import net.dathoang.cqrs.commandbus.message.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -54,13 +58,13 @@ class DefaultPipelineContextContainerTest {
   class DummyMiddleware implements Middleware {
 
     @Override
-    public <R> void preHandle(Command<R> command,
+    public <R> void preHandle(Message<R> message,
         ResultAndExceptionHolder<R> resultAndExceptionHolder) {
 
     }
 
     @Override
-    public <R> void postHandle(Command<R> command,
+    public <R> void postHandle(Message<R> message,
         ResultAndExceptionHolder<R> resultAndExceptionHolder) {
 
     }

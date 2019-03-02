@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.middleware;
 
 public final class ResultAndExceptionHolder<R> {
   private Exception exception;

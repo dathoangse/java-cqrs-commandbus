@@ -1,6 +1,11 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.factory;
 
-import net.dathoang.cqrs.commandbus.exceptions.NoCommandHandlerFoundException;
+import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
+import net.dathoang.cqrs.commandbus.message.Message;
+import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
+import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
+import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -9,20 +14,20 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.cqrs.commandbus.ReflectionUtils.getDeclaredFieldValue;
+import static net.dathoang.cqrs.commandbus.factory.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
 
-class DefaultCommandBusTest {
+class DefaultMessageBusTest {
   @Nested
   @DisplayName("dispatch()")
   class Dispatch {
-    private DefaultCommandBus commandBus;
-    private CommandHandlerFactory handlerFactoryMock;
-    private DummyCommand dummyCommand;
-    private DummyCommandHandler mockCommandHandler;
-    private Object dummyCommandHandlerResult = new Object();
+    private DefaultMessageBus messageBus;
+    private MessageHandlerFactory messageHandlerFactoryMock;
+    private DummyMessage dummyMessage;
+    private DummyMessageHandler mockMessageHandler;
+    private Object dummyMessageHandlerResult = new Object();
     private Middleware middleware1;
     private Middleware middleware2;
     private Middleware middleware3;
@@ -30,35 +35,33 @@ class DefaultCommandBusTest {
     @BeforeEach
     void setUp() throws Exception {
       // Arrange
-      commandBus = new DefaultCommandBus();
-      handlerFactoryMock = mock(CommandHandlerFactory.class);
-      dummyCommand = new DummyCommand();
-      mockCommandHandler = mock(DummyCommandHandler.class);
+      messageHandlerFactoryMock = mock(MessageHandlerFactory.class);
+      dummyMessage = new DummyMessage();
+      mockMessageHandler = mock(DummyMessageHandler.class);
       middleware1 = mock(Middleware.class);
       middleware2 = mock(Middleware.class);
       middleware3 = mock(Middleware.class);
-      commandBus.setHandlerFactory(handlerFactoryMock);
-      commandBus.getMiddlewarePipeline().addAll(asList(
+      messageBus = new DefaultMessageBus(messageHandlerFactoryMock, asList(
           middleware1,
           middleware2,
           middleware3
       ));
 
       // Mock
-      doReturn(mockCommandHandler)
-          .when(handlerFactoryMock).createHandler(dummyCommand.getClass().getName());
-      doReturn(dummyCommandHandlerResult)
-          .when(mockCommandHandler).handle(dummyCommand);
+      doReturn(mockMessageHandler)
+          .when(messageHandlerFactoryMock).createHandler(dummyMessage.getClass().getName());
+      doReturn(dummyMessageHandlerResult)
+          .when(mockMessageHandler).handle(dummyMessage);
     }
 
     @Test
     @DisplayName("should call all middlewares when there is no middleware exception")
     void shouldCallAllMiddlewareWhenNoMiddlewareRaiseException() throws Exception {
       // Act
-      commandBus.dispatch(dummyCommand);
+      messageBus.dispatch(dummyMessage);
 
       // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyCommand);
+      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyMessage);
     }
 
     @Test
@@ -71,16 +74,16 @@ class DefaultCommandBusTest {
         ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder) invocation.getArguments()[1];
         resultAndExceptionHolder.setException(exceptionToRaise);
         return null;
-      }).when(middleware2).preHandle(eq(dummyCommand), any());
+      }).when(middleware2).preHandle(eq(dummyMessage), any());
 
       // Act
-      Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
+      Throwable messageBusException = catchThrowable(() -> messageBus.dispatch(dummyMessage));
 
       // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2), dummyCommand);
+      verifyMiddlewareCallOnce(asList(middleware1, middleware2), dummyMessage);
       verifyMiddlewareNotCalled(middleware3);
-      assertThat(commandBusException)
-          .as("The exception thrown outside of command bus should be the exception raised by middleware")
+      assertThat(messageBusException)
+          .as("The exception thrown outside of message bus should be the exception raised by middleware")
           .isEqualTo(exceptionToRaise);
     }
 
@@ -94,13 +97,13 @@ class DefaultCommandBusTest {
         ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder)invocation.getArguments()[1];
         resultAndExceptionHolder.setResult(resultToRaise);
         return null;
-      }).when(middleware2).preHandle(eq(dummyCommand), any());
+      }).when(middleware2).preHandle(eq(dummyMessage), any());
 
       // Act
-      Object realResult = commandBus.dispatch(dummyCommand);
+      Object realResult = messageBus.dispatch(dummyMessage);
 
       // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2), dummyCommand);
+      verifyMiddlewareCallOnce(asList(middleware1, middleware2), dummyMessage);
       verifyMiddlewareNotCalled(middleware3);
       assertThat(realResult).as("Real result")
           .isEqualTo(resultToRaise);
@@ -116,80 +119,80 @@ class DefaultCommandBusTest {
           .when(middleware2).preHandle(any(), any());
 
       // Act
-      commandBus.dispatch(dummyCommand);
+      messageBus.dispatch(dummyMessage);
 
       // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyCommand);
+      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyMessage);
     }
 
     @Test
-    @DisplayName("should throw NoCommandHandlerFoundException when command handler factory can't create handler for the requested command")
-    void shouldThrowExceptionWhenCommandHandlerFactoryCantCreateCommand() {
+    @DisplayName("should throw NoHandlerFoundException when message handler factory can't create handler for the requested message")
+    void shouldThrowExceptionWhenMessageHandlerFactoryCantCreateMessageHandler() {
       // Arrange
       doReturn(null)
-          .when(handlerFactoryMock).createHandler(dummyCommand.getClass().getName());
+          .when(messageHandlerFactoryMock).createHandler(dummyMessage.getClass().getName());
 
       // Act
-      Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
+      Throwable messageBusException = catchThrowable(() -> messageBus.dispatch(dummyMessage));
 
       // Assert
-      assertThat(commandBusException).isInstanceOf(NoCommandHandlerFoundException.class)
-          .describedAs("Thrown exception should be NoCommandHandlerFoundException");
+      assertThat(messageBusException).isInstanceOf(NoHandlerFoundException.class)
+          .describedAs("Thrown exception should be NoHandlerFoundException");
     }
 
     @Test
-    @DisplayName("should call command handler when there is no short-circuit")
-    void shouldCallCommandHandlerWhenThereIsNoShortCircuit() throws Exception {
+    @DisplayName("should call message handler when there is no short-circuit")
+    void shouldCallMessageHandlerWhenThereIsNoShortCircuit() throws Exception {
       // Act
-      Object commandBusResult = commandBus.dispatch(dummyCommand);
+      Object messageBusResult = messageBus.dispatch(dummyMessage);
 
       // Assert
-      verify(mockCommandHandler, times(1)).handle(dummyCommand);
-      assertThat(commandBusResult).isEqualTo(dummyCommandHandlerResult)
-          .describedAs("Command bus result should be equals to command handler result");
+      verify(mockMessageHandler, times(1)).handle(dummyMessage);
+      assertThat(messageBusResult).isEqualTo(dummyMessageHandlerResult)
+          .describedAs("Message bus result should be equals to message handler result");
     }
 
     @Test
-    @DisplayName("should allow middleware to alter command handler's result")
-    void shouldAllowMiddlewareToAlterCommandHandlerResult() throws Exception {
+    @DisplayName("should allow middleware to alter message handler's result")
+    void shouldAllowMiddlewareToAlterMessageHandlerResult() throws Exception {
       // Arrange
       Object middlewareResult = new Object();
       doAnswer(answer -> {
         ((ResultAndExceptionHolder)answer.getArguments()[1]).setResult(middlewareResult);
         return null;
-      }).when(middleware2).postHandle(eq(dummyCommand), any());
+      }).when(middleware2).postHandle(eq(dummyMessage), any());
 
       // Act
-      Object commandBusResult = commandBus.dispatch(dummyCommand);
+      Object messageBusResult = messageBus.dispatch(dummyMessage);
 
       // Assert
-      assertThat(commandBusResult).isEqualTo(middlewareResult)
-          .describedAs("Command bus result should be equal to middleware result instead of command handler result");
+      assertThat(messageBusResult).isEqualTo(middlewareResult)
+          .describedAs("Message bus result should be equal to middleware result instead of message handler result");
     }
 
     @Test
-    @DisplayName("should allow middleware to catch command handler's exception in the pipeline")
-    void shouldAllowMiddlewareToCatchCommandHandlerException() throws Exception {
+    @DisplayName("should allow middleware to catch message handler's exception in the pipeline")
+    void shouldAllowMiddlewareToCatchMessageHandlerException() throws Exception {
       // Arrange
       doThrow(new Exception())
-          .when(mockCommandHandler).handle(dummyCommand);
+          .when(mockMessageHandler).handle(dummyMessage);
       doAnswer(answer -> {
         // Catch exception in the pipeline by setting exception to null in exception holder
         ((ResultAndExceptionHolder)answer.getArguments()[1]).setException(null);
         return null;
-      }).when(middleware2).postHandle(eq(dummyCommand), any());
+      }).when(middleware2).postHandle(eq(dummyMessage), any());
 
       // Act
-      Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
+      Throwable messageBusException = catchThrowable(() -> messageBus.dispatch(dummyMessage));
 
       // Assert
-      assertThat(commandBusException).isEqualTo(null)
-          .describedAs("Command bus should not throw exception");
+      assertThat(messageBusException).isEqualTo(null)
+          .describedAs("Message bus should not throw exception");
     }
 
     @Test
-    @DisplayName("should inject middleware context successfully into inner middlewares and command handler")
-    void shouldInjectMiddlewareContextSuccessfullyIntoInnerMiddlewaresAndCommandHandler()
+    @DisplayName("should inject middleware context successfully into inner middlewares and message handler")
+    void shouldInjectMiddlewareContextSuccessfullyIntoInnerMiddlewaresAndMessageHandler()
         throws Exception {
       // Arrange
       MiddlewareContextA contextAToInject = new MiddlewareContextA();
@@ -197,21 +200,19 @@ class DefaultCommandBusTest {
       MiddlewareA middlewareA = spy(new MiddlewareA(contextAToInject));
       MiddlewareB middlewareB = spy(new MiddlewareB(contextBToInject));
       MiddlewareC middlewareC = spy(new MiddlewareC());
-      commandBus.getMiddlewarePipeline().clear();
-      commandBus.getMiddlewarePipeline().addAll(asList(
+      DummyInjectedMessageHandler messageHandler = spy(new DummyInjectedMessageHandler());
+      DummyMessage dummyMessage = new DummyMessage();
+      MessageHandlerFactory messageHandlerFactory = mock(MessageHandlerFactory.class);
+      doReturn(messageHandler)
+          .when(messageHandlerFactory).createHandler(dummyMessage.getClass().getName());
+      messageBus = new DefaultMessageBus(messageHandlerFactory, asList(
           middlewareA,
           middlewareB,
           middlewareC
       ));
-      DummyInjectedCommandHandler commandHandler = spy(new DummyInjectedCommandHandler());
-      DummyCommand dummyCommand = new DummyCommand();
-      CommandHandlerFactory handlerFactory = mock(CommandHandlerFactory.class);
-      doReturn(commandHandler)
-          .when(handlerFactory).createHandler(dummyCommand.getClass().getName());
-      commandBus.setHandlerFactory(handlerFactory);
 
       // Act
-      commandBus.dispatch(new DummyCommand());
+      messageBus.dispatch(new DummyMessage());
 
       // Assert
       assertThat(getDeclaredFieldValue(middlewareA, "contextContainer"))
@@ -229,21 +230,21 @@ class DefaultCommandBusTest {
       verify(middlewareC, times(1))
           .setUpDependency(contextAToInject, contextBToInject);
 
-      assertThat(getDeclaredFieldValue(commandHandler, "contextA"))
+      assertThat(getDeclaredFieldValue(messageHandler, "contextA"))
           .isEqualTo(contextAToInject);
-      assertThat(getDeclaredFieldValue(commandHandler, "contextB"))
+      assertThat(getDeclaredFieldValue(messageHandler, "contextB"))
           .isEqualTo(contextBToInject);
-      verify(commandHandler, times(1))
+      verify(messageHandler, times(1))
           .setUpDependency(contextAToInject, contextBToInject);
     }
 
-    private void verifyMiddlewareCallOnce(Middleware middleware, DummyCommand command) {
-      verify(middleware, times(1)).preHandle(eq(command), any());
-      verify(middleware, times(1)).postHandle(eq(command), any());
+    private void verifyMiddlewareCallOnce(Middleware middleware, DummyMessage message) {
+      verify(middleware, times(1)).preHandle(eq(message), any());
+      verify(middleware, times(1)).postHandle(eq(message), any());
     }
 
-    private void verifyMiddlewareCallOnce(List<Middleware> middlewares, DummyCommand command) {
-      middlewares.forEach(middleware -> verifyMiddlewareCallOnce(middleware, command));
+    private void verifyMiddlewareCallOnce(List<Middleware> middlewares, DummyMessage message) {
+      middlewares.forEach(middleware -> verifyMiddlewareCallOnce(middleware, message));
     }
 
     private void verifyMiddlewareNotCalled(Middleware middleware) {
@@ -253,9 +254,9 @@ class DefaultCommandBusTest {
   }
 }
 
-class DummyCommand implements Command<Object> {}
+class DummyMessage implements Message<Object> {}
 
-abstract class DummyCommandHandler implements CommandHandler<DummyCommand, Object> { }
+abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
 
 class MiddlewareA implements Middleware {
   @MiddlewareContext
@@ -268,13 +269,13 @@ class MiddlewareA implements Middleware {
   }
 
   @Override
-  public <R> void preHandle(Command<R> command,
+  public <R> void preHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
     contextContainer.bindContext(MiddlewareContextA.class, contextAToInject);
   }
 
   @Override
-  public <R> void postHandle(Command<R> command,
+  public <R> void postHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
   }
 }
@@ -291,13 +292,13 @@ class MiddlewareB implements Middleware {
   }
 
   @Override
-  public <R> void preHandle(Command<R> command,
+  public <R> void preHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
     contextContainer.bindContext(MiddlewareContextB.class, contextBToInject);
   }
 
   @Override
-  public <R> void postHandle(Command<R> command,
+  public <R> void postHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
   }
 }
@@ -313,17 +314,17 @@ class MiddlewareC implements Middleware {
   }
 
   @Override
-  public <R> void preHandle(Command<R> command,
+  public <R> void preHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
   }
 
   @Override
-  public <R> void postHandle(Command<R> command,
+  public <R> void postHandle(Message<R> message,
       ResultAndExceptionHolder<R> resultAndExceptionHolder) {
   }
 }
 
-class DummyInjectedCommandHandler implements CommandHandler<DummyCommand, Object> {
+class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
   @MiddlewareContext
   private MiddlewareContextA contextA;
   @MiddlewareContext
@@ -334,7 +335,7 @@ class DummyInjectedCommandHandler implements CommandHandler<DummyCommand, Object
   }
 
   @Override
-  public Void handle(DummyCommand command) throws Exception {
+  public Void handle(DummyMessage message) throws Exception {
     return null;
   }
 }
