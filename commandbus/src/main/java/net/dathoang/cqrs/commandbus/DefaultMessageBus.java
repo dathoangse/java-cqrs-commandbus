@@ -14,40 +14,41 @@ final class DefaultMessageBus implements MessageBus {
   private static final Log log = LogFactory.getLog(DefaultMessageBus.class);
 
   private final List<Middleware> middlewarePipeline = new CopyOnWriteArrayList<>();
-  private HandlerFactory handlerFactory;
+  private MessageHandlerFactory messageHandlerFactory;
 
   /**
-   * Find a {@link Handler} that can handle this {@link Message} and dispatch it to the handler
+   * Find a {@link MessageHandler} that can handle this {@link Message} and dispatch it to the handler
    *
    * @param message the message to dispatch
    * @param <R> the type of the result produced after handling the message
    * @return the result after handling the message
    * @throws NoHandlerFoundException when the {@link MessageBus} can't find corresponding
-   *         {@link Handler} for the {@link Message}.
+   *         {@link MessageHandler} for the {@link Message}.
    * @throws Exception
    */
   @Override
   public <R> R dispatch(Message<R> message) throws Exception {
-    Handler<Message<R>, R> handler = handlerFactory.createHandler(message.getClass().getName());
-    if (handler == null) {
+    MessageHandler<Message<R>, R> messageHandler = messageHandlerFactory
+        .createHandler(message.getClass().getName());
+    if (messageHandler == null) {
       throw new NoHandlerFoundException(message.getClass());
     }
-    return dispatchThroughMiddlewarePipeline(message, handler);
+    return dispatchThroughMiddlewarePipeline(message, messageHandler);
   }
 
   public List<Middleware> getMiddlewarePipeline() {
     return middlewarePipeline;
   }
 
-  public HandlerFactory getHandlerFactory() {
-    return handlerFactory;
+  public MessageHandlerFactory getMessageHandlerFactory() {
+    return messageHandlerFactory;
   }
 
-  public void setHandlerFactory(HandlerFactory handlerFactory) {
-    this.handlerFactory = handlerFactory;
+  public void setMessageHandlerFactory(MessageHandlerFactory messageHandlerFactory) {
+    this.messageHandlerFactory = messageHandlerFactory;
   }
 
-  private <R> R dispatchThroughMiddlewarePipeline(Message<R> message, Handler<Message<R>, R> handler) throws Exception {
+  private <R> R dispatchThroughMiddlewarePipeline(Message<R> message, MessageHandler<Message<R>, R> messageHandler) throws Exception {
     List<Middleware> processedMiddlewares = new ArrayList<>();
     ResultAndExceptionHolder<R> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
     PipelineContextContainer contextContainer = new DefaultPipelineContextContainer();
@@ -75,15 +76,15 @@ final class DefaultMessageBus implements MessageBus {
     // Handle the message
     if (resultAndExceptionHolder.getResult() == null
         && resultAndExceptionHolder.getException() == null) {
-      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, handler),
-          String.format("Error while injecting contexts into handler %s", handler.getClass().getName()));
+      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, messageHandler),
+          String.format("Error while injecting contexts into messageHandler %s", messageHandler.getClass().getName()));
       try {
-        R result = handler.handle(message);
+        R result = messageHandler.handle(message);
         resultAndExceptionHolder.setResult(result);
       } catch (Exception ex) {
         log.error(
             String.format("Exception while %s is handling %s, the exception will be passed through the bottom to top " +
-                    "of the middleware pipeline", handler.getClass().getName(), message.getClass().getName()),
+                    "of the middleware pipeline", messageHandler.getClass().getName(), message.getClass().getName()),
             ex);
         resultAndExceptionHolder.setException(ex);
       }

@@ -19,9 +19,9 @@ class DefaultMessageBusTest {
   @DisplayName("dispatch()")
   class Dispatch {
     private DefaultMessageBus commandBus;
-    private HandlerFactory handlerFactoryMock;
+    private MessageHandlerFactory messageHandlerFactoryMock;
     private DummyMessage dummyCommand;
-    private DummyHandler mockCommandHandler;
+    private DummyMessageHandler mockCommandHandler;
     private Object dummyCommandHandlerResult = new Object();
     private Middleware middleware1;
     private Middleware middleware2;
@@ -31,13 +31,13 @@ class DefaultMessageBusTest {
     void setUp() throws Exception {
       // Arrange
       commandBus = new DefaultMessageBus();
-      handlerFactoryMock = mock(HandlerFactory.class);
+      messageHandlerFactoryMock = mock(MessageHandlerFactory.class);
       dummyCommand = new DummyMessage();
-      mockCommandHandler = mock(DummyHandler.class);
+      mockCommandHandler = mock(DummyMessageHandler.class);
       middleware1 = mock(Middleware.class);
       middleware2 = mock(Middleware.class);
       middleware3 = mock(Middleware.class);
-      commandBus.setHandlerFactory(handlerFactoryMock);
+      commandBus.setMessageHandlerFactory(messageHandlerFactoryMock);
       commandBus.getMiddlewarePipeline().addAll(asList(
           middleware1,
           middleware2,
@@ -46,7 +46,7 @@ class DefaultMessageBusTest {
 
       // Mock
       doReturn(mockCommandHandler)
-          .when(handlerFactoryMock).createHandler(dummyCommand.getClass().getName());
+          .when(messageHandlerFactoryMock).createHandler(dummyCommand.getClass().getName());
       doReturn(dummyCommandHandlerResult)
           .when(mockCommandHandler).handle(dummyCommand);
     }
@@ -127,7 +127,7 @@ class DefaultMessageBusTest {
     void shouldThrowExceptionWhenCommandHandlerFactoryCantCreateCommand() {
       // Arrange
       doReturn(null)
-          .when(handlerFactoryMock).createHandler(dummyCommand.getClass().getName());
+          .when(messageHandlerFactoryMock).createHandler(dummyCommand.getClass().getName());
 
       // Act
       Throwable commandBusException = catchThrowable(() -> commandBus.dispatch(dummyCommand));
@@ -203,12 +203,12 @@ class DefaultMessageBusTest {
           middlewareB,
           middlewareC
       ));
-      DummyInjectedHandler commandHandler = spy(new DummyInjectedHandler());
+      DummyInjectedMessageHandler commandHandler = spy(new DummyInjectedMessageHandler());
       DummyMessage dummyCommand = new DummyMessage();
-      HandlerFactory handlerFactory = mock(HandlerFactory.class);
+      MessageHandlerFactory messageHandlerFactory = mock(MessageHandlerFactory.class);
       doReturn(commandHandler)
-          .when(handlerFactory).createHandler(dummyCommand.getClass().getName());
-      commandBus.setHandlerFactory(handlerFactory);
+          .when(messageHandlerFactory).createHandler(dummyCommand.getClass().getName());
+      commandBus.setMessageHandlerFactory(messageHandlerFactory);
 
       // Act
       commandBus.dispatch(new DummyMessage());
@@ -255,7 +255,7 @@ class DefaultMessageBusTest {
 
 class DummyMessage implements Message<Object> {}
 
-abstract class DummyHandler implements Handler<DummyMessage, Object> { }
+abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
 
 class MiddlewareA implements Middleware {
   @MiddlewareContext
@@ -323,7 +323,7 @@ class MiddlewareC implements Middleware {
   }
 }
 
-class DummyInjectedHandler implements Handler<DummyMessage, Object> {
+class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
   @MiddlewareContext
   private MiddlewareContextA contextA;
   @MiddlewareContext
