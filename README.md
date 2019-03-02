@@ -5,9 +5,7 @@ A lightweight & highly extensible CQRS framework for implementing CQRS architect
 * [YouthDev](https://youthdev.net/en/)
 
 ## Build status
-```
-Coming soon...
-```
+[![Build Status](https://travis-ci.com/dathoangse/java-cqrs.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
 
 ## Code style
 The project follows [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) for code style & convention.
