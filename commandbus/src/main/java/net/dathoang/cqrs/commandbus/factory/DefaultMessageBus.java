@@ -1,14 +1,17 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.factory;
 
-import static net.dathoang.cqrs.commandbus.ExceptionUtils.callSafely;
+import static net.dathoang.cqrs.commandbus.factory.ExceptionUtils.callSafely;
 
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
+import net.dathoang.cqrs.commandbus.message.Message;
+import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
+import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 final class DefaultMessageBus implements MessageBus {
   private static final Log log = LogFactory.getLog(DefaultMessageBus.class);

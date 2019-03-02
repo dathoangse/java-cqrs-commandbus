@@ -1,9 +1,11 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.factory;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
+import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus;
+package net.dathoang.cqrs.commandbus.middleware;
 
 /**
  * {@link PipelineContextContainer} is used to store:
