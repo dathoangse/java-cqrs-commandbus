@@ -46,7 +46,7 @@ class DefaultPipelineContextContainerTest {
       // Act
       contextContainer.bindContext(DummyContextInterface.class, dummyContext);
       DummyContextInterface bindedContext =
-          contextContainer.resolveContext(DummyContextInterface.class);
+          (DummyContextInterface)contextContainer.resolveContext(DummyContextInterface.class);
 
       // Assert
       assertThat(bindedContext)

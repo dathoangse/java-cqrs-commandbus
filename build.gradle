@@ -28,4 +28,11 @@ allprojects {
         ignoreFailures = false
         showViolations = true
     }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked"
+            options.compilerArgs << "-Werror"
+        }
+    }
 }

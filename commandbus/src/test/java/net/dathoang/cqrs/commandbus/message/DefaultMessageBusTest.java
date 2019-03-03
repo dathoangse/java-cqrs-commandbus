@@ -13,6 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
@@ -104,7 +105,7 @@ class DefaultMessageBusTest {
       doAnswer(invocation -> {
         ResultAndExceptionHolder resultAndExceptionHolder =
             (ResultAndExceptionHolder)invocation.getArguments()[1];
-        resultAndExceptionHolder.setResult(resultToRaise);
+        setResultToResultHolder(resultToRaise, resultAndExceptionHolder);
         return null;
       }).when(middleware2).preHandle(eq(dummyMessage), any());
 
@@ -116,6 +117,12 @@ class DefaultMessageBusTest {
       verifyMiddlewareNotCalled(middleware3);
       assertThat(realResult).as("Real result")
           .isEqualTo(resultToRaise);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setResultToResultHolder(Object resultToRaise,
+        ResultAndExceptionHolder resultAndExceptionHolder) {
+      resultAndExceptionHolder.setResult(resultToRaise);
     }
 
     @Test
@@ -169,7 +176,8 @@ class DefaultMessageBusTest {
       // Arrange
       Object middlewareResult = new Object();
       doAnswer(answer -> {
-        ((ResultAndExceptionHolder)answer.getArguments()[1]).setResult(middlewareResult);
+        setResultToResultHolder(middlewareResult,
+            (ResultAndExceptionHolder)answer.getArguments()[1]);
         return null;
       }).when(middleware2).postHandle(eq(dummyMessage), any());
 

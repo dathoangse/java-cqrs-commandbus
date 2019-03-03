@@ -56,7 +56,7 @@ class MiddlewareContextInjectorTest {
 
       // Assert
       assertThat(getValuesOfFields(injectingObject, annotatedFieldNames))
-          .containsExactly(duplicateList(dummyContext, 6).toArray(new DummyType[6]));
+          .containsExactly(duplicateList(dummyContext, 6).toArray(new Object[6]));
     }
 
     @Test
@@ -72,7 +72,7 @@ class MiddlewareContextInjectorTest {
 
       // Assert
       assertThat(getValuesOfFields(injectingObject, nonContextFieldNames))
-          .containsExactly(duplicateList(nonAnnotatedFieldValue, 8).toArray(new DummyType[8]));
+          .containsExactly(duplicateList(nonAnnotatedFieldValue, 8).toArray(new Object[8]));
     }
 
     @Test
