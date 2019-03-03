@@ -5,6 +5,6 @@ jdk:
   - oraclejdk8
 
 script:
-  - ./gradlew clean test
+  - ./gradlew clean check
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)

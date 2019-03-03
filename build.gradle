@@ -17,4 +17,15 @@ repositories {
 
 allprojects {
     apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
+
+    checkstyle {
+        toolVersion = '8.18'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        configProperties = [
+                'checkstyle.cache.file': "${buildDir}/checkstyle.cache",
+        ]
+        ignoreFailures = false
+        showViolations = true
+    }
 }
