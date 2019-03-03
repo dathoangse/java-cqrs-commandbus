@@ -25,7 +25,8 @@ class DefaultCommandBusTest {
   @DisplayName("dispatch()")
   class DispatchTest {
     @Test
-    @DisplayName("should dispatch through middleware pipeline and to command handler and return result successfully")
+    @DisplayName("should dispatch through middleware pipeline and to command handler and return "
+        + "result successfully")
     void shouldDispatchThroughMiddlewarePipelineAndTocommandHandlerSuccessfully() throws Exception {
       // Arrange
       DummyCommand dummyCommand = mock(DummyCommand.class);
@@ -57,7 +58,8 @@ class DefaultCommandBusTest {
           .handle(dummyCommand);
       assertThat(commandBusResult)
           .isEqualTo(handlerResult)
-          .describedAs("Result returned from command bus must be same as result returned from command handler");
+          .describedAs("Result returned from command bus must be same as result returned"
+              + "from command handler");
     }
   }
 

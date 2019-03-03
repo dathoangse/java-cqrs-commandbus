@@ -34,7 +34,8 @@ final class DefaultQueryBus implements QueryBus {
 
     private final QueryHandlerFactory queryHandlerFactory;
 
-    public QueryHandlerFactoryToMessageHandlerFactoryAdapter(QueryHandlerFactory queryHandlerFactory) {
+    public QueryHandlerFactoryToMessageHandlerFactoryAdapter(
+        QueryHandlerFactory queryHandlerFactory) {
       this.queryHandlerFactory = queryHandlerFactory;
     }
 
@@ -46,7 +47,8 @@ final class DefaultQueryBus implements QueryBus {
     }
   }
 
-  class QueryHandlerToMessageHandlerAdapter<M extends Message<R>, R> implements MessageHandler<M, R> {
+  class QueryHandlerToMessageHandlerAdapter<M extends Message<R>, R>
+      implements MessageHandler<M, R> {
 
     private final QueryHandler<Query<R>, R> queryHandler;
 

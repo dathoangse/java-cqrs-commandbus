@@ -33,14 +33,15 @@ public interface PipelineContextContainer {
    * The current middleware's context injection supports:
    * - Method injection
    * - Field injection
-   * The middleware's context injection behavior is the same as @Context annotation, the only different
-   * is that this context is provided by outer middleware in the pipeline.
+   * The middleware's context injection behavior is the same as @Context annotation, the only
+   * different is that this context is provided by outer middleware in the pipeline.
    * And there will be no conflicting with the current (C)DI framework, as we will use
    * {@link MiddlewareContext} annotation instead of @Context annotation.
    *
-   * @param contextClass the class type of the context
-   * @param instance the context instance which will be provided to the inner middleware & command handler
-   * @param <R> the type of the context
+   * @param contextClass the class type of the context.
+   * @param instance the context instance which will be provided to the inner middleware & command
+   *        handler.
+   * @param <R> the type of the context.
    */
   <R> void bindContext(Class<R> contextClass, R instance);
 

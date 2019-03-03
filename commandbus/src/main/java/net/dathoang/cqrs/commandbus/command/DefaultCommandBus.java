@@ -16,7 +16,8 @@ import net.dathoang.cqrs.commandbus.middleware.Middleware;
 final class DefaultCommandBus implements CommandBus {
   private final MessageBus defaultMessageBus;
 
-  public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory, List<Middleware> middlewareList) {
+  public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory,
+      List<Middleware> middlewareList) {
     this.defaultMessageBus = MessageBusFactory.create(
         new MessageHandlerFactoryAdapter(commandHandlerFactory), middlewareList
     );

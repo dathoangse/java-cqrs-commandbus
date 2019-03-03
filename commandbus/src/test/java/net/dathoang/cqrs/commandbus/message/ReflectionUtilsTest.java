@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ReflectionUtilsTest {
+  @SuppressWarnings("FieldCanBeLocal")
   private DummyClassA dummyClassA;
   private DummyClassB dummyClassB;
 
@@ -31,22 +32,22 @@ class ReflectionUtilsTest {
   @DisplayName("getAllDeclaredFieldsAnnotatedWith()")
   class GetAllDeclaredFieldsAnnotatedWithTest {
     @Test
-    @DisplayName("should return the class's and superclass's all annotated fields (including public, protected, private)")
+    @DisplayName("should return the class's and superclass's all annotated fields (including "
+        + "public,protected, private)")
     void shouldReturnTheClassAndSuperClassAllAnnotatedFields() {
       // Act
       List<Field> fields = ReflectionUtils
           .getAllDeclaredFieldsAnnotatedWith(dummyClassB.getClass(), DummyAnnotation.class);
 
       // Assert
-      assertThat(fields.stream().map(it -> it.getName()))
+      assertThat(fields.stream().map(Field::getName))
           .containsExactlyInAnyOrder(
               "privateAnnotatedFieldA",
               "protectedAnnotatedFieldA",
               "publicAnnotatedFieldA",
               "privateAnnotatedFieldB",
               "protectedAnnotatedFieldB",
-              "publicAnnotatedFieldB"
-          );
+              "publicAnnotatedFieldB");
     }
   }
 
@@ -54,21 +55,22 @@ class ReflectionUtilsTest {
   @DisplayName("getAllDeclaredMethodsAnnotatedWith()")
   class GetAllDeclaredMethodsAnnotatedWithTest {
     @Test
-    @DisplayName("should return the class's and superclass's all annotated fields (including public, private and protected)")
+    @DisplayName("should return the class's and superclass's all annotated fields (including "
+        + "public, private and protected)")
     void shouldReturnTheClassAndSuperClassAllAnnotatedMethods() {
       // Act
-      List<Method> methods = ReflectionUtils.getAllDeclaredMethodsAnnotatedWith(dummyClassB.getClass(), DummyAnnotation.class);
+      List<Method> methods = ReflectionUtils.getAllDeclaredMethodsAnnotatedWith(
+          dummyClassB.getClass(), DummyAnnotation.class);
 
       // Assert
-      assertThat(methods.stream().map(it -> it.getName()))
+      assertThat(methods.stream().map(Method::getName))
           .containsExactlyInAnyOrder(
               "privateAnnotatedMethodA",
               "protectedAnnotatedMethodA",
               "publicAnnotatedMethodA",
               "privateAnnotatedMethodB",
               "protectedAnnotatedMethodB",
-              "publicAnnotatedMethodB"
-          );
+              "publicAnnotatedMethodB");
     }
   }
 
@@ -83,28 +85,28 @@ class ReflectionUtilsTest {
     @DummyAnnotation
     private Object privateAnnotatedFieldA;
     private Object privateFieldA;
-
     @DummyAnnotation
     protected Object protectedAnnotatedFieldA;
     protected Object protectedFieldA;
-
     @DummyAnnotation
     public Object publicAnnotatedFieldA;
     public Object publicFieldA;
-
     @AnotherDummyAnnotation
     public Object publicFieldAWithAnotherAnnotation;
 
     @DummyAnnotation
     private void privateAnnotatedMethodA() {}
+
     private void privateMethodA() {}
 
     @DummyAnnotation
     protected void protectedAnnotatedMethodA() {}
+
     protected void protectedMethodA() {}
 
     @DummyAnnotation
     public void publicAnnotatedMethodA() {}
+
     public void publicMethodA() {}
 
     @AnotherDummyAnnotation
@@ -115,28 +117,28 @@ class ReflectionUtilsTest {
     @DummyAnnotation
     private Object privateAnnotatedFieldB;
     private Object privateFieldB;
-
     @DummyAnnotation
     protected Object protectedAnnotatedFieldB;
     protected Object protectedFieldB;
-
     @DummyAnnotation
     public Object publicAnnotatedFieldB;
     public Object publicFieldB;
-
     @AnotherDummyAnnotation
     public Object publicFieldBWithAnotherAnnotation;
 
     @DummyAnnotation
     private void privateAnnotatedMethodB() {}
+
     private void privateMethodB() {}
 
     @DummyAnnotation
     protected void protectedAnnotatedMethodB() {}
+
     protected void protectedMethodB() {}
 
     @DummyAnnotation
     public void publicAnnotatedMethodB() {}
+
     public void publicMethodB() {}
 
     @AnotherDummyAnnotation

@@ -29,7 +29,7 @@ final class DefaultPipelineContextContainer implements PipelineContextContainer 
 
   @Override
   public <R> R resolveContext(Class<R> contextClass) {
-    return (R)contextMap.get(contextClass.getName());
+    return contextClass.cast(contextMap.get(contextClass.getName()));
   }
 
   private String formatMiddlewareDataKey(Class<? extends Middleware> middlewareClass, String key) {

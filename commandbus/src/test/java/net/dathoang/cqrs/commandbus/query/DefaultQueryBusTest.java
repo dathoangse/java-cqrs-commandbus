@@ -25,7 +25,8 @@ class DefaultQueryBusTest {
   @DisplayName("dispatch()")
   class DispatchTest {
     @Test
-    @DisplayName("should dispatch through middleware pipeline and to query handler and return result successfully")
+    @DisplayName("should dispatch through middleware pipeline and to query handler and return "
+        + "result successfully")
     void shouldDispatchThroughMiddlewarePipelineAndToQueryHandlerSuccessfully() throws Exception {
       // Arrange
       DummyQuery dummyQuery = mock(DummyQuery.class);
@@ -57,7 +58,8 @@ class DefaultQueryBusTest {
           .handle(dummyQuery);
       assertThat(queryBusResult)
           .isEqualTo(handlerResult)
-          .describedAs("Result returned from query bus must be same as result returned from query handler");
+          .describedAs("Result returned from query bus must be same as result returned "
+              + "from query handler");
     }
   }
 
