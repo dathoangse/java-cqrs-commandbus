@@ -10,22 +10,20 @@ package net.dathoang.cqrs.commandbus.middleware;
 public interface PipelineContextContainer {
 
   /**
-   * Get the handling data of the middleware for the current command
+   * Get the handling data of the middleware for the current command.
    * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
-   * @param <R> the type of the data
    * @return the data at key {@param key} for the middleware {@param middlewareClass}
    */
-  <R> R getMiddlewareData(Class<? extends Middleware> middlewareClass, String key);
+  Object getMiddlewareData(Class<? extends Middleware> middlewareClass, String key);
 
   /**
-   * Set the handling data of the middleware for the current command
+   * Set the handling data of the middleware for the current command.
    * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
    * @param value the value of he data
-   * @param <R> the type of the data
    */
-  <R> void setMiddlewareData(Class<? extends Middleware> middlewareClass, String key, R value);
+  void setMiddlewareData(Class<? extends Middleware> middlewareClass, String key, Object value);
 
   /**
    * Set the context instance {@param instance} to be injected into inner middleware in the pipeline
@@ -33,14 +31,15 @@ public interface PipelineContextContainer {
    * The current middleware's context injection supports:
    * - Method injection
    * - Field injection
-   * The middleware's context injection behavior is the same as @Context annotation, the only different
-   * is that this context is provided by outer middleware in the pipeline.
+   * The middleware's context injection behavior is the same as @Context annotation, the only
+   * different is that this context is provided by outer middleware in the pipeline.
    * And there will be no conflicting with the current (C)DI framework, as we will use
    * {@link MiddlewareContext} annotation instead of @Context annotation.
    *
-   * @param contextClass the class type of the context
-   * @param instance the context instance which will be provided to the inner middleware & command handler
-   * @param <R> the type of the context
+   * @param contextClass the class type of the context.
+   * @param instance the context instance which will be provided to the inner middleware & command
+   *        handler.
+   * @param <R> the type of the context.
    */
   <R> void bindContext(Class<R> contextClass, R instance);
 
@@ -49,8 +48,7 @@ public interface PipelineContextContainer {
    *
    * @see #bindContext(Class, Object)
    * @param contextClass the class type of the dependency
-   * @param <R> the type of the dependency
    * @return the injected dependency
    */
-  <R> R resolveContext(Class<R> contextClass);
+  Object resolveContext(Class contextClass);
 }

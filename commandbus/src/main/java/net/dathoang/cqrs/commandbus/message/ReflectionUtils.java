@@ -13,7 +13,8 @@ final class ReflectionUtils {
 
   private ReflectionUtils() {}
 
-  public static List<Method> getAllDeclaredMethodsAnnotatedWith(Class cls, Class<? extends Annotation> annotationClass) {
+  public static List<Method> getAllDeclaredMethodsAnnotatedWith(
+      Class cls, Class<? extends Annotation> annotationClass) {
     // Retrieve all reflecting classes
     List<Class> reflectingClasses = new ArrayList<>();
     reflectingClasses.add(cls);
@@ -30,7 +31,8 @@ final class ReflectionUtils {
     return resultMethods;
   }
 
-  public static List<Field> getAllDeclaredFieldsAnnotatedWith(Class cls, Class<? extends Annotation> annotationClass) {
+  public static List<Field> getAllDeclaredFieldsAnnotatedWith(
+      Class cls, Class<? extends Annotation> annotationClass) {
     // Retrieve reflecting Classes
     List<Class> reflectingClasses = new ArrayList<>();
     reflectingClasses.add(cls);
@@ -82,7 +84,8 @@ final class ReflectionUtils {
     return superClasses;
   }
 
-  private static List<Method> getDeclaredMethodsAnnotatedWithForSingleClass(Class cls, Class<? extends Annotation> annotationClass) {
+  private static List<Method> getDeclaredMethodsAnnotatedWithForSingleClass(
+      Class cls, Class<? extends Annotation> annotationClass) {
     List<Method> annotatedMethods = new ArrayList<>();
     for (Method method : cls.getDeclaredMethods()) {
       if (method.getAnnotation(annotationClass) != null) {
@@ -92,7 +95,8 @@ final class ReflectionUtils {
     return annotatedMethods;
   }
 
-  private static List<Field> getDeclaredFieldsAnnotatedWithForSingleClass(Class cls, Class<? extends Annotation> annotationClass) {
+  private static List<Field> getDeclaredFieldsAnnotatedWithForSingleClass(
+      Class cls, Class<? extends Annotation> annotationClass) {
     List<Field> annotatedFields = new ArrayList<>();
     for (Field field : cls.getDeclaredFields()) {
       if (field.getAnnotation(annotationClass) != null) {

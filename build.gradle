@@ -17,4 +17,39 @@ repositories {
 
 allprojects {
     apply plugin: 'jacoco'
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+
+    checkstyle {
+        toolVersion = '8.18'
+        configFile = rootProject.file('config/checkstyle/checkstyle.xml')
+        configProperties = [
+                'checkstyle.cache.file': "${buildDir}/checkstyle.cache",
+        ]
+        ignoreFailures = false
+        showViolations = true
+    }
+
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+        findbugsTest.enabled = false
+    }
+    tasks.withType(Pmd){
+        reports{
+            xml.enabled = true
+            html.enabled = true
+        }
+        pmdTest.enabled = false
+    }
+
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            options.compilerArgs << "-Xlint:unchecked"
+            options.compilerArgs << "-Werror"
+        }
+    }
 }

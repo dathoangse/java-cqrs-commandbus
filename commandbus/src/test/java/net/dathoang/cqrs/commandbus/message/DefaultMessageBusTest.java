@@ -1,5 +1,21 @@
 package net.dathoang.cqrs.commandbus.message;
 
+import static java.util.Arrays.asList;
+import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
@@ -9,14 +25,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static java.util.Arrays.asList;
-import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.Mockito.*;
 
 class DefaultMessageBusTest {
   @Nested
@@ -70,7 +78,8 @@ class DefaultMessageBusTest {
 
       // Arrange
       doAnswer(invocation -> {
-        ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder) invocation.getArguments()[1];
+        ResultAndExceptionHolder resultAndExceptionHolder =
+            (ResultAndExceptionHolder) invocation.getArguments()[1];
         resultAndExceptionHolder.setException(exceptionToRaise);
         return null;
       }).when(middleware2).preHandle(eq(dummyMessage), any());
@@ -82,7 +91,8 @@ class DefaultMessageBusTest {
       verifyMiddlewareCallOnce(asList(middleware1, middleware2), dummyMessage);
       verifyMiddlewareNotCalled(middleware3);
       assertThat(messageBusException)
-          .as("The exception thrown outside of message bus should be the exception raised by middleware")
+          .as("The exception thrown outside of message bus should be the exception "
+              + "raised by middleware")
           .isEqualTo(exceptionToRaise);
     }
 
@@ -93,8 +103,9 @@ class DefaultMessageBusTest {
 
       // Arrange
       doAnswer(invocation -> {
-        ResultAndExceptionHolder resultAndExceptionHolder = (ResultAndExceptionHolder)invocation.getArguments()[1];
-        resultAndExceptionHolder.setResult(resultToRaise);
+        ResultAndExceptionHolder resultAndExceptionHolder =
+            (ResultAndExceptionHolder)invocation.getArguments()[1];
+        setResultToResultHolder(resultToRaise, resultAndExceptionHolder);
         return null;
       }).when(middleware2).preHandle(eq(dummyMessage), any());
 
@@ -108,8 +119,15 @@ class DefaultMessageBusTest {
           .isEqualTo(resultToRaise);
     }
 
+    @SuppressWarnings("unchecked")
+    private void setResultToResultHolder(Object resultToRaise,
+        ResultAndExceptionHolder resultAndExceptionHolder) {
+      resultAndExceptionHolder.setResult(resultToRaise);
+    }
+
     @Test
-    @DisplayName("should not short-circuit or raise exception when there is unexpected exception in middleware")
+    @DisplayName("should not short-circuit or raise exception when there is unexpected exception "
+        + "in middleware")
     void shouldNotShortCircuitAndRaiseExceptionWhenThereIsUnexpectedException() throws Exception {
       // Arrange
       doThrow(new RuntimeException())
@@ -125,7 +143,8 @@ class DefaultMessageBusTest {
     }
 
     @Test
-    @DisplayName("should throw NoHandlerFoundException when message handler factory can't create handler for the requested message")
+    @DisplayName("should throw NoHandlerFoundException when message handler factory can't create "
+        + "handler for the requested message")
     void shouldThrowExceptionWhenMessageHandlerFactoryCantCreateMessageHandler() {
       // Arrange
       doReturn(null)
@@ -157,7 +176,8 @@ class DefaultMessageBusTest {
       // Arrange
       Object middlewareResult = new Object();
       doAnswer(answer -> {
-        ((ResultAndExceptionHolder)answer.getArguments()[1]).setResult(middlewareResult);
+        setResultToResultHolder(middlewareResult,
+            (ResultAndExceptionHolder)answer.getArguments()[1]);
         return null;
       }).when(middleware2).postHandle(eq(dummyMessage), any());
 
@@ -166,7 +186,8 @@ class DefaultMessageBusTest {
 
       // Assert
       assertThat(messageBusResult).isEqualTo(middlewareResult)
-          .describedAs("Message bus result should be equal to middleware result instead of message handler result");
+          .describedAs("Message bus result should be equal to middleware result instead "
+              + "of message handler result");
     }
 
     @Test
@@ -190,7 +211,8 @@ class DefaultMessageBusTest {
     }
 
     @Test
-    @DisplayName("should inject middleware context successfully into inner middlewares and message handler")
+    @DisplayName("should inject middleware context successfully into inner middlewares and "
+        + "message handler")
     void shouldInjectMiddlewareContextSuccessfullyIntoInnerMiddlewaresAndMessageHandler()
         throws Exception {
       // Arrange
@@ -253,16 +275,16 @@ class DefaultMessageBusTest {
   }
 
   // region Dummy classes
-  class DummyMessage implements Message<Object> {}
+  static class DummyMessage implements Message<Object> {}
 
   abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
 
-  class MiddlewareA implements Middleware {
+  static class MiddlewareA implements Middleware {
     @MiddlewareContext
     private PipelineContextContainer contextContainer;
     private MiddlewareContextA contextAToInject;
 
-    public MiddlewareA(
+    MiddlewareA(
         MiddlewareContextA contextAToInject) {
       this.contextAToInject = contextAToInject;
     }
@@ -279,14 +301,14 @@ class DefaultMessageBusTest {
     }
   }
 
-  class MiddlewareB implements Middleware {
+  static class MiddlewareB implements Middleware {
     @MiddlewareContext
     private PipelineContextContainer contextContainer;
     @MiddlewareContext
     private MiddlewareContextA contextA;
     private MiddlewareContextB contextBToInject;
 
-    public MiddlewareB(MiddlewareContextB contextBToInject) {
+    MiddlewareB(MiddlewareContextB contextBToInject) {
       this.contextBToInject = contextBToInject;
     }
 
@@ -302,11 +324,12 @@ class DefaultMessageBusTest {
     }
   }
 
-  class MiddlewareC implements Middleware {
+  static class MiddlewareC implements Middleware {
     @MiddlewareContext
     private MiddlewareContextA contextA;
     @MiddlewareContext
     private MiddlewareContextB contextB;
+
     @MiddlewareContext
     protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
 
@@ -323,11 +346,12 @@ class DefaultMessageBusTest {
     }
   }
 
-  class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
+  static class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
     @MiddlewareContext
     private MiddlewareContextA contextA;
     @MiddlewareContext
     private MiddlewareContextB contextB;
+
     @MiddlewareContext
     protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
 
@@ -339,8 +363,8 @@ class DefaultMessageBusTest {
     }
   }
 
-  class MiddlewareContextA {}
+  private class MiddlewareContextA {}
 
-  class MiddlewareContextB {}
+  private class MiddlewareContextB {}
   // endregion
 }

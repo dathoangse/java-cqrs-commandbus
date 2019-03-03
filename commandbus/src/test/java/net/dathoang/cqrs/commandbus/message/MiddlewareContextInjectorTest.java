@@ -56,11 +56,12 @@ class MiddlewareContextInjectorTest {
 
       // Assert
       assertThat(getValuesOfFields(injectingObject, annotatedFieldNames))
-          .containsExactly(duplicateList(dummyContext, 6).toArray(new DummyType[6]));
+          .containsExactly(duplicateList(dummyContext, 6).toArray(new Object[6]));
     }
 
     @Test
-    @DisplayName("should not inject context into fields that doesn't have @MiddlewareContext annotation")
+    @DisplayName("should not inject context into fields that doesn't have @MiddlewareContext "
+        + "annotation")
     void shouldNotInjectContextIntoFieldsThatDoesntHaveMiddlewareContextAnnotation() {
       // Arrange
       DummyType nonAnnotatedFieldValue = new DummyType();
@@ -71,7 +72,7 @@ class MiddlewareContextInjectorTest {
 
       // Assert
       assertThat(getValuesOfFields(injectingObject, nonContextFieldNames))
-          .containsExactly(duplicateList(nonAnnotatedFieldValue, 8).toArray(new DummyType[8]));
+          .containsExactly(duplicateList(nonAnnotatedFieldValue, 8).toArray(new Object[8]));
     }
 
     @Test
@@ -88,7 +89,8 @@ class MiddlewareContextInjectorTest {
     }
 
     @Test
-    @DisplayName("should not inject context into methods that doesn't have @MiddlewareContext annotation")
+    @DisplayName("should not inject context into methods that doesn't have @MiddlewareContext "
+        + "annotation")
     void shouldNotInjectContextIntoMethodsThatDoesntHaveMiddlewareContextAnnotation() {
       // Arrange
       DummyClassB injectingObject = spy(new DummyClassB());
@@ -117,7 +119,8 @@ class MiddlewareContextInjectorTest {
         .publicAnnotatedMethodB(context);
   }
 
-  private static void verifyNonAnnotatedMethodsNotCalled(DummyClassB injectingObject, DummyType context) {
+  private static void verifyNonAnnotatedMethodsNotCalled(
+      DummyClassB injectingObject, DummyType context) {
     verify(injectingObject, Mockito.times(0))
         .onPrivateMethodACalled(any());
     verify(injectingObject, Mockito.times(0))
@@ -181,8 +184,13 @@ class MiddlewareContextInjectorTest {
     public DummyClassA() {}
 
     public DummyClassA(DummyType annotatedFieldValue, DummyType nonAnnotatedFieldValue) {
-      privateAnnotatedFieldA = protectedAnnotatedFieldA = publicAnnotatedFieldA = annotatedFieldValue;
-      privateFieldA = protectedFieldA = publicFieldA = publicFieldAWithAnotherAnnotation = nonAnnotatedFieldValue;
+      privateAnnotatedFieldA = annotatedFieldValue;
+      protectedAnnotatedFieldA = annotatedFieldValue;
+      publicAnnotatedFieldA = annotatedFieldValue;
+      privateFieldA = nonAnnotatedFieldValue;
+      protectedFieldA = nonAnnotatedFieldValue;
+      publicFieldA = nonAnnotatedFieldValue;
+      publicFieldAWithAnotherAnnotation = nonAnnotatedFieldValue;
     }
 
     @MiddlewareContext
@@ -229,8 +237,13 @@ class MiddlewareContextInjectorTest {
 
     public DummyClassB(DummyType annotatedFieldValue, DummyType nonAnnotatedFieldValue) {
       super(annotatedFieldValue, nonAnnotatedFieldValue);
-      privateAnnotatedFieldB = protectedAnnotatedFieldB = publicAnnotatedFieldB = annotatedFieldValue;
-      privateFieldB = protectedFieldB = publicFieldB = publicFieldBWithAnotherAnnotation = nonAnnotatedFieldValue;
+      privateAnnotatedFieldB = annotatedFieldValue;
+      protectedAnnotatedFieldB = annotatedFieldValue;
+      publicAnnotatedFieldB = annotatedFieldValue;
+      privateFieldB = nonAnnotatedFieldValue;
+      protectedFieldB = nonAnnotatedFieldValue;
+      publicFieldB = nonAnnotatedFieldValue;
+      publicFieldBWithAnotherAnnotation = nonAnnotatedFieldValue;
     }
 
     @MiddlewareContext

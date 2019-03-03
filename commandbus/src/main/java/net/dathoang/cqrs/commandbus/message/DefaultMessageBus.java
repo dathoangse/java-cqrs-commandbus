@@ -1,14 +1,19 @@
 package net.dathoang.cqrs.commandbus.message;
 
+import static net.dathoang.cqrs.commandbus.message.ExceptionUtils.callSafely;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.ArrayList;
-import java.util.List;
+
 
 final class DefaultMessageBus implements MessageBus {
   private static final Log log = LogFactory.getLog(DefaultMessageBus.class);
@@ -22,14 +27,15 @@ final class DefaultMessageBus implements MessageBus {
   }
 
   /**
-   * Find a {@link MessageHandler} that can handle this {@link Message} and dispatch it to the handler
+   * Find a {@link MessageHandler} that can handle this {@link Message} and dispatch it to the
+   * handler.
    *
    * @param message the message to dispatch
    * @param <R> the type of the result produced after handling the message
    * @return the result after handling the message
    * @throws NoHandlerFoundException when the {@link MessageBus} can't find corresponding
    *         {@link MessageHandler} for the {@link Message}.
-   * @throws Exception
+   * @throws Exception possibly raised by Middleware or MessageHandler
    */
   @Override
   public <R> R dispatch(Message<R> message) throws Exception {
@@ -41,7 +47,8 @@ final class DefaultMessageBus implements MessageBus {
     return dispatchThroughMiddlewarePipeline(message, messageHandler);
   }
 
-  private <R> R dispatchThroughMiddlewarePipeline(Message<R> message, MessageHandler<Message<R>, R> messageHandler) throws Exception {
+  private <R> R dispatchThroughMiddlewarePipeline(Message<R> message,
+      MessageHandler<Message<R>, R> messageHandler) throws Exception {
     List<Middleware> processedMiddlewares = new ArrayList<>();
     ResultAndExceptionHolder<R> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
     PipelineContextContainer contextContainer = new DefaultPipelineContextContainer();
@@ -49,9 +56,9 @@ final class DefaultMessageBus implements MessageBus {
     // Pre-handle the message
     for (int i = 0; i < middlewarePipeline.size(); ++i) {
       Middleware middleware = middlewarePipeline.get(i);
-      ExceptionUtils
-          .callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, middleware),
-          String.format("Error while injecting contexts into middleware %s", middleware.getClass().getName()));
+      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, middleware),
+          String.format("Error while injecting contexts into middleware %s",
+              middleware.getClass().getName()));
       try {
         processedMiddlewares.add(middleware);
         middleware.preHandle(message, resultAndExceptionHolder);
@@ -61,8 +68,8 @@ final class DefaultMessageBus implements MessageBus {
         }
       } catch (Exception ex) {
         log.error(
-            String.format("Exception while %s is pre-handling %s, the error is intentionally bypassed",
-                middleware.getClass().getName(), message.getClass().getName()),
+            String.format("Exception while %s is pre-handling %s, the error is intentionally "
+                    + "bypassed", middleware.getClass().getName(), message.getClass().getName()),
             ex);
       }
     }
@@ -70,16 +77,17 @@ final class DefaultMessageBus implements MessageBus {
     // Handle the message
     if (resultAndExceptionHolder.getResult() == null
         && resultAndExceptionHolder.getException() == null) {
-      ExceptionUtils
-          .callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, messageHandler),
-          String.format("Error while injecting contexts into messageHandler %s", messageHandler.getClass().getName()));
+      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, messageHandler),
+          String.format("Error while injecting contexts into messageHandler %s",
+              messageHandler.getClass().getName()));
       try {
         R result = messageHandler.handle(message);
         resultAndExceptionHolder.setResult(result);
       } catch (Exception ex) {
         log.error(
-            String.format("Exception while %s is handling %s, the exception will be passed through the bottom to top " +
-                    "of the middleware pipeline", messageHandler.getClass().getName(), message.getClass().getName()),
+            String.format("Exception while %s is handling %s, the exception will be passed "
+                + "through the bottom to top of the middleware pipeline",
+                messageHandler.getClass().getName(), message.getClass().getName()),
             ex);
         resultAndExceptionHolder.setException(ex);
       }
@@ -92,8 +100,8 @@ final class DefaultMessageBus implements MessageBus {
         middleware.postHandle(message, resultAndExceptionHolder);
       } catch (Exception ex) {
         log.error(
-            String.format("Exception while %s is post-handling %s, the error is intentionally bypassed",
-                middleware.getClass().getName(), message.getClass().getName()),
+            String.format("Exception while %s is post-handling %s, the error is intentionally "
+                    + "bypassed", middleware.getClass().getName(), message.getClass().getName()),
             ex);
       }
     }

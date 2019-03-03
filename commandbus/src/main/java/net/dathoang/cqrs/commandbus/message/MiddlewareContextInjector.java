@@ -19,7 +19,8 @@ final class MiddlewareContextInjector {
     injectContextIntoFields(contextContainer, injectingObject);
   }
 
-  private static void injectContextIntoMethods(PipelineContextContainer contextContainer, Object injectingObject) {
+  private static void injectContextIntoMethods(
+      PipelineContextContainer contextContainer, Object injectingObject) {
     List<Method> injectingMethods = ReflectionUtils.getAllDeclaredMethodsAnnotatedWith(
         injectingObject.getClass(), MiddlewareContext.class);
 
@@ -35,7 +36,8 @@ final class MiddlewareContextInjector {
         } else {
           Object context = contextContainer.resolveContext(parameterType);
           if (context == null) {
-            log.error(String.format("Can't find context of type %s in context container to inject into %s",
+            log.error(String.format("Can't find context of type %s in context container to inject "
+                    + "into %s",
                     parameterType.getName(), injectingObject.getClass().getName()));
           }
           arguments.add(context);
@@ -46,13 +48,15 @@ final class MiddlewareContextInjector {
       try {
         injectingMethod.invoke(injectingObject, arguments.toArray(new Object[arguments.size()]));
       } catch (Exception ex) {
-        log.error(String.format("Error while trying to inject contexts into %s by invoking %s method",
+        log.error(String.format("Error while trying to inject contexts into %s by invoking %s "
+                + "method",
             injectingObject.getClass().getName(), injectingMethod.getClass().getName()));
       }
     }
   }
 
-  private static void injectContextIntoFields(PipelineContextContainer contextContainer, Object injectingObject) {
+  private static void injectContextIntoFields(PipelineContextContainer contextContainer,
+      Object injectingObject) {
     List<Field> injectingFields = ReflectionUtils.getAllDeclaredFieldsAnnotatedWith(
         injectingObject.getClass(), MiddlewareContext.class);
 
@@ -67,7 +71,8 @@ final class MiddlewareContextInjector {
           if (context != null) {
             injectingField.set(injectingObject, context);
           } else {
-            log.error(String.format("Can't find context of type %s in context container to inject into %s",
+            log.error(String.format("Can't find context of type %s in context container to inject "
+                    + "into %s",
                 injectingField.getType().getName(), injectingObject.getClass().getName()));
           }
         }

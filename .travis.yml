@@ -4,7 +4,27 @@ install: true
 jdk:
   - oraclejdk8
 
-script:
-  - ./gradlew clean test
-  - ./gradlew jacocoTestReport
-  - bash <(curl -s https://codecov.io/bash)
+stages:
+  - analyze
+  - test
+
+jobs:
+  include:
+    - stage: analyze
+      name: "Analyze production code using PMD"
+      script: ./gradlew clean pmdMain
+
+    - stage: analyze
+      name: "Analyze production code using Findbugs"
+      script: ./gradlew clean findbugsMain
+
+    - stage: analyze
+      name: "Analyze code style using checkstyle"
+      script: ./gradlew clean checkstyleMain checkstyleTest
+
+    - stage: test
+      name: "Execute unit test"
+      script:
+        - ./gradlew clean test
+        - ./gradlew jacocoTestReport
+        - bash <(curl -s https://codecov.io/bash)

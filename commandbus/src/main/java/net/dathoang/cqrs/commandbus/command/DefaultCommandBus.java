@@ -16,7 +16,8 @@ import net.dathoang.cqrs.commandbus.middleware.Middleware;
 final class DefaultCommandBus implements CommandBus {
   private final MessageBus defaultMessageBus;
 
-  public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory, List<Middleware> middlewareList) {
+  public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory,
+      List<Middleware> middlewareList) {
     this.defaultMessageBus = MessageBusFactory.create(
         new MessageHandlerFactoryAdapter(commandHandlerFactory), middlewareList
     );
@@ -28,7 +29,7 @@ final class DefaultCommandBus implements CommandBus {
   }
 
   // region adapter classes
-  class MessageHandlerFactoryAdapter implements MessageHandlerFactory {
+  static class MessageHandlerFactoryAdapter implements MessageHandlerFactory {
 
     private final CommandHandlerFactory commandHandlerFactory;
 
@@ -44,7 +45,7 @@ final class DefaultCommandBus implements CommandBus {
     }
   }
 
-  class MessageHandlerAdapter<M extends Message<R>, R> implements MessageHandler<M, R> {
+  static class MessageHandlerAdapter<M extends Message<R>, R> implements MessageHandler<M, R> {
 
     private final CommandHandler<Command<R>, R> commandHandler;
 

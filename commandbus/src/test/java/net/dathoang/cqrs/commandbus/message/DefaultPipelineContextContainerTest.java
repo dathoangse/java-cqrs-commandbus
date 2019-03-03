@@ -2,11 +2,9 @@ package net.dathoang.cqrs.commandbus.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import net.dathoang.cqrs.commandbus.message.DefaultPipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
-import net.dathoang.cqrs.commandbus.message.Message;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -14,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class DefaultPipelineContextContainerTest {
   @Nested
   @DisplayName("getMiddlewareData() & getMiddlewareData()")
-  class GetSetMiddlewareDataTest {
+  static class GetSetMiddlewareDataTest {
     private static final String TEST_KEY = "test_key";
     private static final String TEST_VALUE = "test_value";
 
@@ -36,7 +34,7 @@ class DefaultPipelineContextContainerTest {
 
   @Nested
   @DisplayName("bindContext() & resolveContext()")
-  class BindResolveContextTest {
+  static class BindResolveContextTest {
     private final DummyContext dummyContext = new DummyContext();
 
     @Test
@@ -47,7 +45,8 @@ class DefaultPipelineContextContainerTest {
 
       // Act
       contextContainer.bindContext(DummyContextInterface.class, dummyContext);
-      DummyContextInterface bindedContext = contextContainer.resolveContext(DummyContextInterface.class);
+      DummyContextInterface bindedContext =
+          (DummyContextInterface)contextContainer.resolveContext(DummyContextInterface.class);
 
       // Assert
       assertThat(bindedContext)
@@ -73,7 +72,7 @@ class DefaultPipelineContextContainerTest {
 
   interface DummyContextInterface {}
 
-  class DummyContext implements DummyContextInterface {}
+  static class DummyContext implements DummyContextInterface {}
   // endregion
 }
 
