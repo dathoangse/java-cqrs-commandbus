@@ -1,26 +1,24 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.command;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.command.Command;
 import net.dathoang.cqrs.commandbus.command.CommandBus;
 import net.dathoang.cqrs.commandbus.command.CommandHandler;
 import net.dathoang.cqrs.commandbus.command.CommandHandlerFactory;
+import net.dathoang.cqrs.commandbus.command.DefaultCommandBus;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class DefaultCommandBusTest {
   @Nested

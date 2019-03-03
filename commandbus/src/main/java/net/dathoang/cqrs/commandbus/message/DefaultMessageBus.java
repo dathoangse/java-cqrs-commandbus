@@ -1,9 +1,6 @@
-package net.dathoang.cqrs.commandbus.factory;
-
-import static net.dathoang.cqrs.commandbus.factory.ExceptionUtils.callSafely;
+package net.dathoang.cqrs.commandbus.message;
 
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
-import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
@@ -52,7 +49,8 @@ final class DefaultMessageBus implements MessageBus {
     // Pre-handle the message
     for (int i = 0; i < middlewarePipeline.size(); ++i) {
       Middleware middleware = middlewarePipeline.get(i);
-      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, middleware),
+      ExceptionUtils
+          .callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, middleware),
           String.format("Error while injecting contexts into middleware %s", middleware.getClass().getName()));
       try {
         processedMiddlewares.add(middleware);
@@ -72,7 +70,8 @@ final class DefaultMessageBus implements MessageBus {
     // Handle the message
     if (resultAndExceptionHolder.getResult() == null
         && resultAndExceptionHolder.getException() == null) {
-      callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, messageHandler),
+      ExceptionUtils
+          .callSafely(() -> MiddlewareContextInjector.injectContext(contextContainer, messageHandler),
           String.format("Error while injecting contexts into messageHandler %s", messageHandler.getClass().getName()));
       try {
         R result = messageHandler.handle(message);

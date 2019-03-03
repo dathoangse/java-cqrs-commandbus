@@ -1,7 +1,7 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.message;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.cqrs.commandbus.factory.ReflectionUtils.getDeclaredFieldValue;
+import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -15,6 +15,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
+import net.dathoang.cqrs.commandbus.message.MiddlewareContextInjector;
 import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import org.junit.jupiter.api.BeforeEach;

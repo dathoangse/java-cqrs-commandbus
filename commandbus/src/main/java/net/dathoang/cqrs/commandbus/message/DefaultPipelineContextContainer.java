@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.message;
 
 import java.util.HashMap;
 import java.util.Map;
