@@ -3,9 +3,12 @@ package net.dathoang.cqrs.commandbus.message;
 import static java.util.Arrays.asList;
 import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -15,7 +18,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
-import net.dathoang.cqrs.commandbus.message.MiddlewareContextInjector;
 import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,6 +103,26 @@ class MiddlewareContextInjectorTest {
       // Assert
       verifyNonAnnotatedMethodsNotCalled(injectingObject, dummyContext);
     }
+
+    @Test
+    @DisplayName("should not throw exception if annotated injecting methods throw exception")
+    void shouldNotThrowExceptionIfAnnotatedInjectingMethodsThrowException() {
+      // Arrange
+      DummyClassB injectingObject = spy(new DummyClassB());
+      doThrow(new RuntimeException())
+          .when(injectingObject).publicAnnotatedMethodB(any());
+
+      // Act
+      Throwable ex = catchThrowable(() ->
+          MiddlewareContextInjector.injectContext(contextContainer, injectingObject)
+      );
+
+      // Assert
+      verify(injectingObject, times(1))
+          .publicAnnotatedMethodB(any());
+      assertThat(ex)
+          .isNull();
+    }
   }
 
   private static void verifyAnnotatedMethodsCalled(DummyClassB injectingObject, DummyType context) {
@@ -180,6 +202,8 @@ class MiddlewareContextInjectorTest {
     public DummyType publicFieldA;
     @DummyAnnotation
     public DummyType publicFieldAWithAnotherAnnotation;
+    @MiddlewareContext
+    public Object publicAnnotatedFieldAWithNotBindedContext;
 
     public DummyClassA() {}
 
@@ -214,6 +238,9 @@ class MiddlewareContextInjectorTest {
 
     @DummyAnnotation
     public void publicMethodAWithAnotherAnnotation(DummyType context) {}
+
+    @MiddlewareContext
+    public void publicAnnotatedMethodAWithNotBindedContext(Object context) {}
 
     protected void onPrivateAnnotatedMethodACalled(DummyType context) {}
 
