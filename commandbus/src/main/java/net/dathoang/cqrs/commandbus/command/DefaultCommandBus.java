@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.command;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.command.Command;
@@ -7,14 +7,19 @@ import net.dathoang.cqrs.commandbus.command.CommandHandler;
 import net.dathoang.cqrs.commandbus.command.CommandHandlerFactory;
 import net.dathoang.cqrs.commandbus.exceptions.InvalidMessageTypeException;
 import net.dathoang.cqrs.commandbus.message.Message;
+import net.dathoang.cqrs.commandbus.message.MessageBus;
+import net.dathoang.cqrs.commandbus.message.MessageBusFactory;
+import net.dathoang.cqrs.commandbus.message.MessageHandler;
+import net.dathoang.cqrs.commandbus.message.MessageHandlerFactory;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 
 final class DefaultCommandBus implements CommandBus {
-  private final DefaultMessageBus defaultMessageBus;
+  private final MessageBus defaultMessageBus;
 
   public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory, List<Middleware> middlewareList) {
-    this.defaultMessageBus = new DefaultMessageBus(
-        new MessageHandlerFactoryAdapter(commandHandlerFactory), middlewareList);
+    this.defaultMessageBus = MessageBusFactory.create(
+        new MessageHandlerFactoryAdapter(commandHandlerFactory), middlewareList
+    );
   }
 
   @Override

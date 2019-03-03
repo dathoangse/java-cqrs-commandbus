@@ -1,7 +1,6 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.message;
 
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
-import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
@@ -14,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.cqrs.commandbus.factory.ReflectionUtils.getDeclaredFieldValue;
+import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.*;
@@ -252,94 +251,96 @@ class DefaultMessageBusTest {
       verify(middleware, times(0)).postHandle(any(), any());
     }
   }
+
+  // region Dummy classes
+  class DummyMessage implements Message<Object> {}
+
+  abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
+
+  class MiddlewareA implements Middleware {
+    @MiddlewareContext
+    private PipelineContextContainer contextContainer;
+    private MiddlewareContextA contextAToInject;
+
+    public MiddlewareA(
+        MiddlewareContextA contextAToInject) {
+      this.contextAToInject = contextAToInject;
+    }
+
+    @Override
+    public <R> void preHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+      contextContainer.bindContext(MiddlewareContextA.class, contextAToInject);
+    }
+
+    @Override
+    public <R> void postHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    }
+  }
+
+  class MiddlewareB implements Middleware {
+    @MiddlewareContext
+    private PipelineContextContainer contextContainer;
+    @MiddlewareContext
+    private MiddlewareContextA contextA;
+    private MiddlewareContextB contextBToInject;
+
+    public MiddlewareB(MiddlewareContextB contextBToInject) {
+      this.contextBToInject = contextBToInject;
+    }
+
+    @Override
+    public <R> void preHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+      contextContainer.bindContext(MiddlewareContextB.class, contextBToInject);
+    }
+
+    @Override
+    public <R> void postHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    }
+  }
+
+  class MiddlewareC implements Middleware {
+    @MiddlewareContext
+    private MiddlewareContextA contextA;
+    @MiddlewareContext
+    private MiddlewareContextB contextB;
+    @MiddlewareContext
+    protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
+
+    }
+
+    @Override
+    public <R> void preHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    }
+
+    @Override
+    public <R> void postHandle(Message<R> message,
+        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
+    }
+  }
+
+  class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
+    @MiddlewareContext
+    private MiddlewareContextA contextA;
+    @MiddlewareContext
+    private MiddlewareContextB contextB;
+    @MiddlewareContext
+    protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
+
+    }
+
+    @Override
+    public Void handle(DummyMessage message) throws Exception {
+      return null;
+    }
+  }
+
+  class MiddlewareContextA {}
+
+  class MiddlewareContextB {}
+  // endregion
 }
-
-class DummyMessage implements Message<Object> {}
-
-abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
-
-class MiddlewareA implements Middleware {
-  @MiddlewareContext
-  private PipelineContextContainer contextContainer;
-  private MiddlewareContextA contextAToInject;
-
-  public MiddlewareA(
-      MiddlewareContextA contextAToInject) {
-    this.contextAToInject = contextAToInject;
-  }
-
-  @Override
-  public <R> void preHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    contextContainer.bindContext(MiddlewareContextA.class, contextAToInject);
-  }
-
-  @Override
-  public <R> void postHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-  }
-}
-
-class MiddlewareB implements Middleware {
-  @MiddlewareContext
-  private PipelineContextContainer contextContainer;
-  @MiddlewareContext
-  private MiddlewareContextA contextA;
-  private MiddlewareContextB contextBToInject;
-
-  public MiddlewareB(MiddlewareContextB contextBToInject) {
-    this.contextBToInject = contextBToInject;
-  }
-
-  @Override
-  public <R> void preHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    contextContainer.bindContext(MiddlewareContextB.class, contextBToInject);
-  }
-
-  @Override
-  public <R> void postHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-  }
-}
-
-class MiddlewareC implements Middleware {
-  @MiddlewareContext
-  private MiddlewareContextA contextA;
-  @MiddlewareContext
-  private MiddlewareContextB contextB;
-  @MiddlewareContext
-  protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
-
-  }
-
-  @Override
-  public <R> void preHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-  }
-
-  @Override
-  public <R> void postHandle(Message<R> message,
-      ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-  }
-}
-
-class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
-  @MiddlewareContext
-  private MiddlewareContextA contextA;
-  @MiddlewareContext
-  private MiddlewareContextB contextB;
-  @MiddlewareContext
-  protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
-
-  }
-
-  @Override
-  public Void handle(DummyMessage message) throws Exception {
-    return null;
-  }
-}
-
-class MiddlewareContextA {}
-
-class MiddlewareContextB {}

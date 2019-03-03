@@ -1,8 +1,12 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.query;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.exceptions.InvalidMessageTypeException;
 import net.dathoang.cqrs.commandbus.message.Message;
+import net.dathoang.cqrs.commandbus.message.MessageBus;
+import net.dathoang.cqrs.commandbus.message.MessageBusFactory;
+import net.dathoang.cqrs.commandbus.message.MessageHandler;
+import net.dathoang.cqrs.commandbus.message.MessageHandlerFactory;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.query.Query;
 import net.dathoang.cqrs.commandbus.query.QueryBus;
@@ -11,10 +15,10 @@ import net.dathoang.cqrs.commandbus.query.QueryHandlerFactory;
 
 final class DefaultQueryBus implements QueryBus {
 
-  private final DefaultMessageBus defaultMessageBus;
+  private final MessageBus defaultMessageBus;
 
   public DefaultQueryBus(QueryHandlerFactory queryHandlerFactory, List<Middleware> middlewareList) {
-    defaultMessageBus = new DefaultMessageBus(
+    defaultMessageBus = MessageBusFactory.create(
         new QueryHandlerFactoryToMessageHandlerFactoryAdapter(queryHandlerFactory),
         middlewareList
     );

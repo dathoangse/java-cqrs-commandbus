@@ -1,7 +1,8 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import net.dathoang.cqrs.commandbus.message.DefaultPipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
 import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;

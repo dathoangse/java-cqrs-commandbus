@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.message;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

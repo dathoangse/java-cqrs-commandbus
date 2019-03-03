@@ -1,4 +1,4 @@
-package net.dathoang.cqrs.commandbus.factory;
+package net.dathoang.cqrs.commandbus.query;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -10,10 +10,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import net.dathoang.cqrs.commandbus.command.CommandBus;
-import net.dathoang.cqrs.commandbus.command.CommandHandler;
-import net.dathoang.cqrs.commandbus.command.CommandHandlerFactory;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.query.DefaultQueryBus;
 import net.dathoang.cqrs.commandbus.query.Query;
 import net.dathoang.cqrs.commandbus.query.QueryBus;
 import net.dathoang.cqrs.commandbus.query.QueryHandler;
