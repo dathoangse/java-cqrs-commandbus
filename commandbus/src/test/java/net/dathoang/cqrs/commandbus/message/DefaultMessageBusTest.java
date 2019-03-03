@@ -13,7 +13,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
@@ -134,6 +133,24 @@ class DefaultMessageBusTest {
           .when(middleware1).preHandle(any(), any());
       doThrow(new RuntimeException())
           .when(middleware2).preHandle(any(), any());
+
+      // Act
+      messageBus.dispatch(dummyMessage);
+
+      // Assert
+      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyMessage);
+    }
+
+    @Test
+    @DisplayName("should safely bypass unhandled exceptions raised by middleware.postHandle()")
+    void shouldSafelyBypassUnhandledExceptionsRaisedByMiddlewarePostHandler() throws Exception {
+      // Arrange
+      doThrow(new RuntimeException())
+          .when(middleware1).postHandle(any(), any());
+      doThrow(new RuntimeException())
+          .when(middleware2).postHandle(any(), any());
+      doThrow(new RuntimeException())
+          .when(middleware3).postHandle(any(), any());
 
       // Act
       messageBus.dispatch(dummyMessage);
