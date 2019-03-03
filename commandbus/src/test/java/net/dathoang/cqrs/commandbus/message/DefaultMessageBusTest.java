@@ -275,11 +275,11 @@ class DefaultMessageBusTest {
   }
 
   // region Dummy classes
-  class DummyMessage implements Message<Object> {}
+  static class DummyMessage implements Message<Object> {}
 
   abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
 
-  class MiddlewareA implements Middleware {
+  static class MiddlewareA implements Middleware {
     @MiddlewareContext
     private PipelineContextContainer contextContainer;
     private MiddlewareContextA contextAToInject;
@@ -301,7 +301,7 @@ class DefaultMessageBusTest {
     }
   }
 
-  class MiddlewareB implements Middleware {
+  static class MiddlewareB implements Middleware {
     @MiddlewareContext
     private PipelineContextContainer contextContainer;
     @MiddlewareContext
@@ -324,7 +324,7 @@ class DefaultMessageBusTest {
     }
   }
 
-  class MiddlewareC implements Middleware {
+  static class MiddlewareC implements Middleware {
     @MiddlewareContext
     private MiddlewareContextA contextA;
     @MiddlewareContext
@@ -346,7 +346,7 @@ class DefaultMessageBusTest {
     }
   }
 
-  class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
+  static class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
     @MiddlewareContext
     private MiddlewareContextA contextA;
     @MiddlewareContext

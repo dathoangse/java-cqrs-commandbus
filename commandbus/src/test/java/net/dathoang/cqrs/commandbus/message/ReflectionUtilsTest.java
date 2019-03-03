@@ -17,14 +17,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class ReflectionUtilsTest {
-  @SuppressWarnings("FieldCanBeLocal")
-  private DummyClassA dummyClassA;
   private DummyClassB dummyClassB;
 
   @BeforeEach
   void setUp() {
     // Arrange
-    dummyClassA = mock(DummyClassA.class);
     dummyClassB = mock(DummyClassB.class);
   }
 

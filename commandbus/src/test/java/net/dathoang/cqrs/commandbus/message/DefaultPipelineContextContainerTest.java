@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 class DefaultPipelineContextContainerTest {
   @Nested
   @DisplayName("getMiddlewareData() & getMiddlewareData()")
-  class GetSetMiddlewareDataTest {
+  static class GetSetMiddlewareDataTest {
     private static final String TEST_KEY = "test_key";
     private static final String TEST_VALUE = "test_value";
 
@@ -34,7 +34,7 @@ class DefaultPipelineContextContainerTest {
 
   @Nested
   @DisplayName("bindContext() & resolveContext()")
-  class BindResolveContextTest {
+  static class BindResolveContextTest {
     private final DummyContext dummyContext = new DummyContext();
 
     @Test
@@ -72,7 +72,7 @@ class DefaultPipelineContextContainerTest {
 
   interface DummyContextInterface {}
 
-  class DummyContext implements DummyContextInterface {}
+  static class DummyContext implements DummyContextInterface {}
   // endregion
 }
 

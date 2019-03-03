@@ -10,7 +10,7 @@ package net.dathoang.cqrs.commandbus.middleware;
 public interface PipelineContextContainer {
 
   /**
-   * Get the handling data of the middleware for the current command
+   * Get the handling data of the middleware for the current command.
    * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
    * @return the data at key {@param key} for the middleware {@param middlewareClass}
@@ -18,7 +18,7 @@ public interface PipelineContextContainer {
   Object getMiddlewareData(Class<? extends Middleware> middlewareClass, String key);
 
   /**
-   * Set the handling data of the middleware for the current command
+   * Set the handling data of the middleware for the current command.
    * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
    * @param value the value of he data

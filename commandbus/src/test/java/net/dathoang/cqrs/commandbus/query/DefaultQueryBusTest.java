@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 class DefaultQueryBusTest {
   @Nested
   @DisplayName("dispatch()")
-  class DispatchTest {
+  static class DispatchTest {
     @Test
     @DisplayName("should dispatch through middleware pipeline and to query handler and return "
         + "result successfully")

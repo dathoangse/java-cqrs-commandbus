@@ -29,7 +29,7 @@ final class DefaultCommandBus implements CommandBus {
   }
 
   // region adapter classes
-  class MessageHandlerFactoryAdapter implements MessageHandlerFactory {
+  static class MessageHandlerFactoryAdapter implements MessageHandlerFactory {
 
     private final CommandHandlerFactory commandHandlerFactory;
 
@@ -45,7 +45,7 @@ final class DefaultCommandBus implements CommandBus {
     }
   }
 
-  class MessageHandlerAdapter<M extends Message<R>, R> implements MessageHandler<M, R> {
+  static class MessageHandlerAdapter<M extends Message<R>, R> implements MessageHandler<M, R> {
 
     private final CommandHandler<Command<R>, R> commandHandler;
 
