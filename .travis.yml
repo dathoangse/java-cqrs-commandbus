@@ -25,6 +25,6 @@ jobs:
     - stage: test
       name: "Execute unit test"
       script:
-        - ./gradlew clean check
+        - ./gradlew clean test
         - ./gradlew jacocoTestReport
         - bash <(curl -s https://codecov.io/bash)
