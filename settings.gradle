@@ -9,4 +9,5 @@
 
 rootProject.name = 'java-cqrs'
 include 'commandbus'
+include 'commandbus-middlewares'
 
