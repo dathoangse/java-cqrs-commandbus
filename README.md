@@ -1,12 +1,11 @@
 # Java CQRS
+[![Build Status](https://travis-ci.com/dathoangse/java-cqrs.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
+[![codecov](https://codecov.io/gh/dathoangse/java-cqrs/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs)
+
 A lightweight & highly extensible CQRS framework for implementing CQRS architectural pattern in java
 
 ## Who uses Java CQRS
 * [YouthDev](https://youthdev.net/en/)
-
-## Build status
-[![Build Status](https://travis-ci.com/dathoangse/java-cqrs.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
-[![codecov](https://codecov.io/gh/dathoangse/java-cqrs/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs)
 
 ## Code style
 The project follows [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) for code style & convention.
@@ -51,11 +50,6 @@ To run unit test, run the command in terminal at the root of the project:
 ./gradlew clean test
 ```
 
-## How to use?
-```
-Coming soon...
-```
-
 ## Contribute
 We welcome all contributions.
 Please fork the repository and base your work on `develop` branch.
@@ -64,6 +58,4 @@ Before creating pull request, please make sure:
 * There is 100% code coverage on all new codes.
 
 ## License
-```
-Coming soon
-```
+Java CQRS is an Open Source Software released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html)
