@@ -7,7 +7,7 @@
  * in the user guide at https://docs.gradle.org/5.0/userguide/multi_project_builds.html
  */
 
-rootProject.name = 'java-cqrs'
-include 'commandbus'
-include 'commandbus-middlewares'
+rootProject.name = 'java-cqrs-commandbus'
+include 'core'
+include 'simple-middlewares'
 
