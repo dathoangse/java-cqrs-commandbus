@@ -7,7 +7,8 @@ jdk:
 stages:
   - analyze
   - test
-  - publish
+  - name: release
+    if: branch = master
 
 jobs:
   include:
@@ -30,11 +31,8 @@ jobs:
         - ./gradlew jacocoTestReport
         - bash <(curl -s https://codecov.io/bash)
 
-    - stage: publish
-      name: "Publish to Maven Central Repository"
-      branches:
-        only:
-          - master
+    - stage: release
+      name: "Release to Maven Central Repository"
       script:
         - ./prepare_before_publish
         - ./gradlew publish
