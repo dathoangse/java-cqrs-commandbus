@@ -118,8 +118,8 @@ publishing {
         maven {
             url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
             credentials {
-                username sonatypeUsername
-                password sonatypePassword
+                username project.properties['CQRS_COMMANDBUS_SONATYPE_USERNAME']
+                password project.properties['CQRS_COMMANDBUS_SONATYPE_PASSWORD']
             }
         }
     }
@@ -140,6 +140,16 @@ model {
 
 signing {
     sign configurations.archives
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.allTasks.any { it instanceof Sign }) {
+        allprojects {
+            ext."signing.keyId" = project.properties['CQRS_COMMANDBUS_SIGNING_KEY_ID']
+            ext."signing.secretKeyRingFile" = project.properties['CQRS_COMMANDBUS_SECRET_KEYRING_FILE']
+            ext."signing.password" = project.properties['CQRS_COMMANDBUS_SIGNING_PASSWORD']
+        }
+    }
 }
 
 def customizePom(pom) {

@@ -28,3 +28,15 @@ jobs:
         - ./gradlew clean test
         - ./gradlew jacocoTestReport
         - bash <(curl -s https://codecov.io/bash)
+
+    - stage: publish
+      name: "Publish to Maven Central Repository"
+      branches:
+        only:
+          - master
+      script:
+        - ./prepare_before_publish
+        - ./gradlew publish
+
+after_script:
+  - ./clean_after_publish
