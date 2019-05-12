@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo $CQRS_COMMANDBUS_GPG_SECRET_RING_BASE64 | base64 --decode > .secret_ring
