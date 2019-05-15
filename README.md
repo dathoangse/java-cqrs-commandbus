@@ -1,10 +1,11 @@
-# Java CQRS
-[![Build Status](https://travis-ci.com/dathoangse/java-cqrs.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
+# Java CQRS CommandBus
+[![Build Status](https://travis-ci.com/dathoangse/java-cqrs-commandbus.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
 [![codecov](https://codecov.io/gh/dathoangse/java-cqrs/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/core/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/core)
 
-A lightweight & highly extensible CQRS framework for implementing CQRS architectural pattern in java
+A lightweight & highly extensible CQRS framework for implementing application layer and CQRS architectural pattern in Java.
 
-## Who uses Java CQRS
+## Who uses Java CQRS CommandBus
 * [YouthDev](https://youthdev.net/en/)
 
 ## Code style
@@ -16,8 +17,6 @@ The project uses [Git flow](https://nvie.com/posts/a-successful-git-branching-mo
 ## Versioning
 The project uses [Semantic Versioning 2.0.0 | Semantic Versioning](https://semver.org/) for versioning releases.
 
-Special note: When the major version of the project is still 0 (ex: v0.1.3), the framework is not ready for production use, and the framework interface is still not stable (which means there might be some breaking changes between minor versions when the major version is still 0).
-
 ## Libs/frameworks used
 * [JUnit 5](https://junit.org/junit5/) for unit testing.
 * [AssertJ](http://joel-costigliola.github.io/assertj/) for assertions in unit test.
@@ -28,26 +27,31 @@ Built with:
 * [Gradle Build Tool](https://gradle.org/).
 
 # Features
-`Java CQRS` is a very lightweight and highly extensible CQRS framework that help you implement the CQRS architecture into your project.
-Characteristics:
-1. `Lightweight`: The core interfaces of the framework is minimized, making it easy to swap out the implementation of the whole framework, and you can easily integrate into your project with little efforts.
-2. `Highly extensible`: The lib provide a very high extensibility via a *middleware pipeline* and well-structured modules.
-3. `Architecturally unoptionated`: The framework doesn't make any assumption about the architecture you're building, thus it doesn't force you to design your architecture in a certain architectural style. CQRS can be implemented at different levels & scales, depending on your project requirement.
-So:
-* You can simply take the command bus and use it to implement your application layer to act as a bridge between your UI/presentation layer & domain layer, and simply have the read side (read models/operations) and write side (write models/operations) separated.
-* Or you can take it to the next level and have a separated read database & write database that keep in sync using event projection mechanism, which can help to make the read side massively scalable & extremely high performance.
-* Or you can even design using full-blown CQRS & Event Sourcing architectural pattern that use event store as the single source of truth.
+`Java CQRS CommandBus` is a very lightweight and highly extensible CQRS CommandBus library that help you implement your application layer and CQRS architectural pattern:
+1. `Lightweight`: The library comes with 2 distinct core modules: the `spec` module and the `core` module. The `spec` module (will be available in the future) contains all the public interfaces of the framework, these interfaces are minimized to reduce the dependency of your project on the library, and your project only need to depends on the `spec` module. The `core` module contains the library's implementation of the `spec` module, your code will not need to depends on this module at all, dependency injection framework will automatically bind the implementation of the `core` module to the interfaces in the `spec` module. With this design, it's possible and easy to swap out or reimplement the whole library with minimal efforts and without affecting your codebase.
+2. `Highly extensible`: We consider extensibility as the core value of the library, so we design it to make it highly extensible via: middleware pipeline. You can inject any custom middleware to intercept the handling of the commands dispatched into the bus.
 
-## Build
-To build, run the command in terminal at the root of the project:
+## Integrate into your project
+
+### For maven project
+
+Add the dependency:
+
 ```
-./gradlew clean build
+<dependency>
+    <groupId>net.dathoang.cqrs.commandbus</groupId>
+    <artifactId>core</artifactId>
+    <version>0.1.0</version>
+    <type>pom</type>
+</dependency>
 ```
 
-## Tests
-To run unit test, run the command in terminal at the root of the project:
+### For gradle project
+
+Add the dependency:
+
 ```
-./gradlew clean test
+compile group: 'net.dathoang.cqrs.commandbus', name: 'core', version: '0.1.0', ext: 'pom'
 ```
 
 ## Contribute
@@ -58,4 +62,4 @@ Before creating pull request, please make sure:
 * There is 100% code coverage on all new codes.
 
 ## License
-Java CQRS is an Open Source Software released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html)
+Java CQRS CommandBus is an Open Source Software released under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
