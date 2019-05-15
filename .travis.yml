@@ -7,8 +7,7 @@ jdk:
 stages:
   - analyze
   - test
-  - name: release
-    if: branch = master
+  - release
 
 jobs:
   include:
@@ -33,6 +32,7 @@ jobs:
 
     - stage: release
       name: "Release to Maven Central Repository"
+      if: tag =~ ^v
       script:
         - ./prepare_before_publish
         - ./gradlew publish
