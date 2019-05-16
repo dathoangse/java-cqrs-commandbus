@@ -17,6 +17,11 @@ repositories {
     jcenter()
 }
 
+dependencies {
+    compile project(':core')
+    compile project(':simple-middlewares')
+}
+
 allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'checkstyle'

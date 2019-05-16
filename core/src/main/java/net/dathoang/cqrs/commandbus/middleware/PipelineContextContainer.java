@@ -13,7 +13,7 @@ public interface PipelineContextContainer {
    * Get the handling data of the middleware for the current command.
    * @param middlewareClass the class of the current middleware (for name-spacing)
    * @param key the key of the data
-   * @return the data at key {@param key} for the middleware {@param middlewareClass}
+   * @return the data at key key for the middleware middlewareClass
    */
   Object getMiddlewareData(Class<? extends Middleware> middlewareClass, String key);
 
@@ -26,7 +26,7 @@ public interface PipelineContextContainer {
   void setMiddlewareData(Class<? extends Middleware> middlewareClass, String key, Object value);
 
   /**
-   * Set the context instance {@param instance} to be injected into inner middleware in the pipeline
+   * Set the context instance to be injected into inner middleware in the pipeline
    * or into the command handler.
    * The current middleware's context injection supports:
    * - Method injection
@@ -37,7 +37,7 @@ public interface PipelineContextContainer {
    * {@link MiddlewareContext} annotation instead of @Context annotation.
    *
    * @param contextClass the class type of the context.
-   * @param instance the context instance which will be provided to the inner middleware & command
+   * @param instance the context instance which will be provided to the inner middleware and command
    *        handler.
    * @param <R> the type of the context.
    */
