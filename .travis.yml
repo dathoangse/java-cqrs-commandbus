@@ -35,7 +35,13 @@ jobs:
       if: tag =~ ^v
       script:
         - ./prepare_before_publish
-        - ./gradlew publish
+        - ./gradlew core:publish
+        - ./cleanup_after_publish
 
-after_script:
-  - ./clean_after_publish
+    # - stage: release
+    #   name: "Publish snapshot"
+    #   if: branch =~ ^(hotfix|release)\/.*
+    #   script:
+    #     - ./prepare_before_publish
+    #     - ./gradlew core:publish -PSNAPSHOT=true
+    #     - ./cleanup_after_publish
