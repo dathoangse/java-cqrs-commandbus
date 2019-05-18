@@ -35,7 +35,7 @@ jobs:
       if: tag =~ ^v
       script:
         - ./prepare_before_publish
-        - ./gradlew publish
+        - ./gradlew core:publish
 
 after_script:
   - ./clean_after_publish
