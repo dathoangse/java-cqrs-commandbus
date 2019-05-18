@@ -36,12 +36,12 @@ jobs:
       script:
         - ./prepare_before_publish
         - ./gradlew core:publish
-        - ./clean_after_publish
+        - ./cleanup_after_publish
 
-    - stage: release
-      name: "Publish snapshot"
-      if: branch =~ ^(hotfix|release)\/.*
-      script:
-        - ./prepare_before_publish
-        - ./gradlew core:publish -PSNAPSHOT=true
-        - ./clean_after_publish
+    # - stage: release
+    #   name: "Publish snapshot"
+    #   if: branch =~ ^(hotfix|release)\/.*
+    #   script:
+    #     - ./prepare_before_publish
+    #     - ./gradlew core:publish -PSNAPSHOT=true
+    #     - ./cleanup_after_publish
