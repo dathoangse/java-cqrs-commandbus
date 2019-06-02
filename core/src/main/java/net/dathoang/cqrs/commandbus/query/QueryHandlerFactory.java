@@ -1,5 +1,5 @@
 package net.dathoang.cqrs.commandbus.query;
 
 public interface QueryHandlerFactory {
-  <R> QueryHandler<Query<R>, R> createHandler(String queryName);
+  <R> QueryHandler<Query<R>, R> createQueryHandler(String queryName);
 }

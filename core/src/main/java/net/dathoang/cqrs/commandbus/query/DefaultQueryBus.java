@@ -37,7 +37,7 @@ public final class DefaultQueryBus implements QueryBus {
     @Override
     public <R> MessageHandler<Message<R>, R> createHandler(String messageName) {
       return new QueryHandlerToMessageHandlerAdapter<>(
-          queryHandlerFactory.createHandler(messageName)
+          queryHandlerFactory.createQueryHandler(messageName)
       );
     }
   }

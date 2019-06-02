@@ -11,11 +11,6 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
-import net.dathoang.cqrs.commandbus.query.DefaultQueryBus;
-import net.dathoang.cqrs.commandbus.query.Query;
-import net.dathoang.cqrs.commandbus.query.QueryBus;
-import net.dathoang.cqrs.commandbus.query.QueryHandler;
-import net.dathoang.cqrs.commandbus.query.QueryHandlerFactory;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,7 +31,7 @@ class DefaultQueryBusTest {
           .when(dummyQueryHandler).handle(dummyQuery);
       QueryHandlerFactory queryHandlerFactory = mock(QueryHandlerFactory.class);
       doReturn(dummyQueryHandler)
-          .when(queryHandlerFactory).createHandler(dummyQuery.getClass().getName());
+          .when(queryHandlerFactory).createQueryHandler(dummyQuery.getClass().getName());
       List<Middleware> middlewareList = asList(
           mock(Middleware.class),
           mock(Middleware.class),
