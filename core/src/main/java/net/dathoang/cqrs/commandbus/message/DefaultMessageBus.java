@@ -15,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 
-final class DefaultMessageBus implements MessageBus {
+public final class DefaultMessageBus implements MessageBus {
   private static final Log log = LogFactory.getLog(DefaultMessageBus.class);
 
   private final List<Middleware> middlewarePipeline;

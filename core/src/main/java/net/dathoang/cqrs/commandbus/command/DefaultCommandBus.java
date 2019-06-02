@@ -8,7 +8,7 @@ import net.dathoang.cqrs.commandbus.message.MessageHandler;
 import net.dathoang.cqrs.commandbus.message.MessageHandlerFactory;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 
-final class DefaultCommandBus implements CommandBus {
+public final class DefaultCommandBus implements CommandBus {
   private final MessageBus defaultMessageBus;
 
   DefaultCommandBus(CommandHandlerFactory commandHandlerFactory,

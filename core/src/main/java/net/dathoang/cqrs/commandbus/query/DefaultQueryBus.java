@@ -8,7 +8,7 @@ import net.dathoang.cqrs.commandbus.message.MessageHandler;
 import net.dathoang.cqrs.commandbus.message.MessageHandlerFactory;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 
-final class DefaultQueryBus implements QueryBus {
+public final class DefaultQueryBus implements QueryBus {
 
   private final MessageBus defaultMessageBus;
 
