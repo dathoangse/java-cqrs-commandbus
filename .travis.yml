@@ -40,7 +40,7 @@ jobs:
 
     - stage: release
       name: "Publish snapshot"
-      if: branch =~ ^(hotfix|release)\/.*
+      if: branch =~ ^(develop|hotfix|release).*
       script:
         - ./prepare_before_publish
         - ./gradlew core:publish -PSNAPSHOT=true
