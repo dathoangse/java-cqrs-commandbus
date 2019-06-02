@@ -10,11 +10,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import net.dathoang.cqrs.commandbus.command.Command;
-import net.dathoang.cqrs.commandbus.command.CommandBus;
-import net.dathoang.cqrs.commandbus.command.CommandHandler;
-import net.dathoang.cqrs.commandbus.command.CommandHandlerFactory;
-import net.dathoang.cqrs.commandbus.command.DefaultCommandBus;
+
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -36,7 +32,7 @@ class DefaultCommandBusTest {
           .when(dummyCommandHandler).handle(dummyCommand);
       CommandHandlerFactory commandHandlerFactory = mock(CommandHandlerFactory.class);
       doReturn(dummyCommandHandler)
-          .when(commandHandlerFactory).createHandler(dummyCommand.getClass().getName());
+          .when(commandHandlerFactory).createCommandHandler(dummyCommand.getClass().getName());
       List<Middleware> middlewareList = asList(
           mock(Middleware.class),
           mock(Middleware.class),

@@ -35,7 +35,7 @@ public final class DefaultCommandBus implements CommandBus {
     @Override
     public <R> MessageHandler<Message<R>, R> createHandler(String messageName) {
       return new MessageHandlerAdapter<>(
-          commandHandlerFactory.createHandler(messageName)
+          commandHandlerFactory.createCommandHandler(messageName)
       );
     }
   }
