@@ -81,7 +81,7 @@ allprojects {
             mavenJava(MavenPublication) {
                 customizePom(pom)
                 groupId 'net.dathoang.cqrs.commandbus'
-                version '0.1.1'
+                version '0.2.0'
                 if (project.properties['SNAPSHOT'] == 'true') {
                     version (version + '-SNAPSHOT')
                 }
