@@ -9,6 +9,8 @@ repositories {
 }
 
 dependencies {
+    implementation project(':commandbus-spec')
+
     implementation 'commons-logging:commons-logging:1.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
