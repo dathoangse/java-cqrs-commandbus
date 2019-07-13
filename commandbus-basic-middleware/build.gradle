@@ -10,7 +10,8 @@ repositories {
 
 dependencies {
     implementation 'commons-logging:commons-logging:1.2'
-    compile project(':commandbus-core')
+    implementation project(':commandbus-core')
+    implementation project(':commandbus-spec')
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.4.0'
     testImplementation 'org.assertj:assertj-core:3.11.1'
