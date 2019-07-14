@@ -11,4 +11,5 @@ rootProject.name = 'java-cqrs-commandbus'
 include 'commandbus-core'
 include 'commandbus-basic-middleware'
 include 'commandbus-spec'
+include 'commandbus-spring'
 
