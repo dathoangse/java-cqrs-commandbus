@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    compile project(':core')
-    compile project(':simple-middlewares')
+    compile project(':commandbus-core')
+    compile project(':commandbus-basic-middleware')
 }
 
 allprojects {
