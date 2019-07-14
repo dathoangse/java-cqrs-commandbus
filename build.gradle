@@ -15,11 +15,6 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    compile project(':commandbus-core')
-    compile project(':commandbus-basic-middleware')
-}
-
 allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'checkstyle'

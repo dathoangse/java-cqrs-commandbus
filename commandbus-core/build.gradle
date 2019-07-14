@@ -50,7 +50,7 @@ jacocoTestReport {
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId 'core'
+            artifactId 'commandbus-core'
         }
     }
 }

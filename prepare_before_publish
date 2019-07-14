@@ -1,3 +1,9 @@
 #!/bin/bash
 
-echo $CQRS_COMMANDBUS_GPG_SECRET_RING_BASE64 | base64 --decode > core/.secret_ring
+echo $CQRS_COMMANDBUS_GPG_SECRET_RING_BASE64 | base64 --decode > .secret_ring
+cp .secret_ring commandbus-spec/
+cp .secret_ring commandbus-core/
+cp .secret_ring commandbus-basic-middleware/
+cp .secret_ring commandbus-core-full/
+cp .secret_ring commandbus-spring/
+cp .secret_ring commandbus-spring-full/

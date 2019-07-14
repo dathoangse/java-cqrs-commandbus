@@ -11,13 +11,17 @@ repositories {
 }
 
 dependencies {
+    compile project(':commandbus-spec')
+    compile project(':commandbus-core')
+    compile project(':commandbus-basic-middleware')
+
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifactId 'commandbus-spec'
+            artifactId 'commandbus-core-full'
         }
     }
 }

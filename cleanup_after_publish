@@ -1,3 +1,4 @@
 #!/bin/bash
 
-rm -f core/.secret_ring
+rm -f .secret_ring
+rm -f */.secret_ring
