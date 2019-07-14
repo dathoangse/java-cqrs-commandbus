@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+version 'unspecified'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile project(':commandbus-spec')
+    compile project(':commandbus-core')
+    compile project(':commandbus-basic-middleware')
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
