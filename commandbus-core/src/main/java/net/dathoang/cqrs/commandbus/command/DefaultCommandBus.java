@@ -3,11 +3,7 @@ package net.dathoang.cqrs.commandbus.command;
 import java.util.List;
 
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
-import net.dathoang.cqrs.commandbus.message.Message;
-import net.dathoang.cqrs.commandbus.message.MessageBus;
-import net.dathoang.cqrs.commandbus.message.MessageBusFactory;
-import net.dathoang.cqrs.commandbus.message.MessageHandler;
-import net.dathoang.cqrs.commandbus.message.MessageHandlerFactory;
+import net.dathoang.cqrs.commandbus.message.*;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 
 public final class DefaultCommandBus implements CommandBus {
@@ -15,7 +11,7 @@ public final class DefaultCommandBus implements CommandBus {
 
   public DefaultCommandBus(CommandHandlerFactory commandHandlerFactory,
       List<Middleware> middlewareList) {
-    this.defaultMessageBus = MessageBusFactory.create(
+    this.defaultMessageBus = new DefaultMessageBus(
         new MessageHandlerFactoryAdapter(commandHandlerFactory), middlewareList
     );
   }
@@ -33,6 +29,7 @@ public final class DefaultCommandBus implements CommandBus {
       this.commandHandlerFactory = commandHandlerFactory;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <R> MessageHandler<Message<R>, R> createHandler(String messageName) {
       CommandHandler handler = commandHandlerFactory.createCommandHandler(messageName);

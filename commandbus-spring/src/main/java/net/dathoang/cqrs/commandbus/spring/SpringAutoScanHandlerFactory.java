@@ -19,6 +19,7 @@ public class SpringAutoScanHandlerFactory extends AutoScanHandlerFactory {
     this.startScanningHandler();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   protected Function<Class, Object> getBeanFactory() {
     return (cls) -> {
