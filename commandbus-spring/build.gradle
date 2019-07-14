@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+version 'unspecified'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation project(':commandbus-spec')
+    implementation project(':commandbus-core')
+    implementation project(':commandbus-basic-middleware')
+
+    implementation 'org.reflections:reflections:0.9.11'
+
+    compile group: 'org.springframework', name: 'spring-context', version: '5.1.8.RELEASE'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
