@@ -46,3 +46,11 @@ jacocoTestReport {
         html.enabled false
     }
 }
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId 'commandbus-basic-middleware'
+        }
+    }
+}

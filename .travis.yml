@@ -35,7 +35,12 @@ jobs:
       if: tag =~ ^v
       script:
         - ./prepare_before_publish
-        - ./gradlew core:publish
+        - ./gradlew commandbus-spec:publish
+        - ./gradlew commandbus-core:publish
+        - ./gradlew commandbus-basic-middleware:publish
+        - ./gradlew commandbus-core-full:publish
+        - ./gradlew commandbus-spring:publish
+        - ./gradlew commandbus-spring-full:publish
         - ./cleanup_after_publish
 
     - stage: release
@@ -43,5 +48,10 @@ jobs:
       if: branch =~ ^(develop|hotfix|release).*
       script:
         - ./prepare_before_publish
-        - ./gradlew core:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-spec:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-core:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-basic-middleware:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-core-full:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-spring:publish -PSNAPSHOT=true
+        - ./gradlew commandbus-spring-full:publish -PSNAPSHOT=true
         - ./cleanup_after_publish
