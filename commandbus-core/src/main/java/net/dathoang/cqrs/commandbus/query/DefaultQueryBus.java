@@ -1,6 +1,8 @@
 package net.dathoang.cqrs.commandbus.query;
 
 import java.util.List;
+
+import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
 import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.message.MessageBus;
 import net.dathoang.cqrs.commandbus.message.MessageBusFactory;
@@ -12,7 +14,7 @@ public final class DefaultQueryBus implements QueryBus {
 
   private final MessageBus defaultMessageBus;
 
-  DefaultQueryBus(QueryHandlerFactory queryHandlerFactory, List<Middleware> middlewareList) {
+  public DefaultQueryBus(QueryHandlerFactory queryHandlerFactory, List<Middleware> middlewareList) {
     defaultMessageBus = MessageBusFactory.create(
         new QueryHandlerFactoryToMessageHandlerFactoryAdapter(queryHandlerFactory),
         middlewareList
@@ -36,9 +38,12 @@ public final class DefaultQueryBus implements QueryBus {
 
     @Override
     public <R> MessageHandler<Message<R>, R> createHandler(String messageName) {
-      return new QueryHandlerToMessageHandlerAdapter<>(
-          queryHandlerFactory.createQueryHandler(messageName)
-      );
+      QueryHandler queryHandler = queryHandlerFactory.createQueryHandler(messageName);
+      if (queryHandler == null) {
+        throw new NoHandlerFoundException(messageName);
+      }
+
+      return new QueryHandlerToMessageHandlerAdapter<>(queryHandler);
     }
   }
 
