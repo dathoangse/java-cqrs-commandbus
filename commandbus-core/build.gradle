@@ -9,7 +9,7 @@ repositories {
 }
 
 dependencies {
-    compile project(':commandbus-spec')
+    implementation project(':commandbus-spec')
 
     implementation 'commons-logging:commons-logging:1.2'
 
