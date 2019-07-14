@@ -61,14 +61,16 @@ public class CommandBusSpringConfiguration {
   }
 
   private HandlerFactoryConfig scanHandlerFactoryConfig() {
-    // TODO: Implement
-
-    return null;
+    return (HandlerFactoryConfig) applicationContext.getBeansWithAnnotation(Configuration.class).values().stream()
+        .filter(c -> c instanceof HandlerFactoryConfig)
+        .findFirst()
+        .orElse(null);
   }
 
   private MiddlewareConfig scanMiddlewareConfig() {
-    // TODO: Implement
-
-    return null;
+    return (MiddlewareConfig) applicationContext.getBeansWithAnnotation(Configuration.class).values().stream()
+        .filter(c -> c instanceof MiddlewareConfig)
+        .findFirst()
+        .orElse(null);
   }
 }
