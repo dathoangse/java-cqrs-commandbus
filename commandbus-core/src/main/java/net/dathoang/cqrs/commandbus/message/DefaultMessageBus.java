@@ -21,7 +21,7 @@ public final class DefaultMessageBus implements MessageBus {
   private final List<Middleware> middlewarePipeline;
   private MessageHandlerFactory messageHandlerFactory;
 
-  DefaultMessageBus(MessageHandlerFactory handlerFactory, List<Middleware> middlewareList) {
+  public DefaultMessageBus(MessageHandlerFactory handlerFactory, List<Middleware> middlewareList) {
     messageHandlerFactory = handlerFactory;
     middlewarePipeline = new ArrayList<>(middlewareList);
   }

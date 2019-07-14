@@ -56,6 +56,7 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
     });
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public <R> QueryHandler<Query<R>, R> createQueryHandler(String queryName) {
     Class<? extends QueryHandler> handlerClass = handlerClassByQueryNameMap.get(queryName);
@@ -66,6 +67,8 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
     return QueryHandler.class.cast(getBeanFactory().apply(handlerClass));
   }
 
+
+  @SuppressWarnings("unchecked")
   @Override
   public <R> CommandHandler<Command<R>, R> createCommandHandler(String commandName) {
     Class<? extends CommandHandler> handlerClass = handlerClassByCommandNameMap.get(commandName);
