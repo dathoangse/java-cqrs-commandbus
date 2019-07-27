@@ -1,35 +1,12 @@
 # Java CQRS CommandBus
 [![Build Status](https://travis-ci.com/dathoangse/java-cqrs-commandbus.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs-commandbus)
 [![codecov](https://codecov.io/gh/dathoangse/java-cqrs-commandbus/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs-commandbus)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/core/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/core)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/core/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/commandbus-spec)
 
 A lightweight & highly extensible CQRS framework for implementing application layer and CQRS architectural pattern in Java.
 
 ## Who uses Java CQRS CommandBus
 * [YouthDev](https://youthdev.net/en/)
-
-## Code style
-The project follows [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html) for code style & convention.
-
-## Git workflow
-The project uses [Git flow](https://nvie.com/posts/a-successful-git-branching-model/) for git workflow.
-
-## Versioning
-The project uses [Semantic Versioning 2.0.0](https://semver.org/) for versioning releases.
-
-## Libs/frameworks used
-* [JUnit 5](https://junit.org/junit5/) for unit testing.
-* [AssertJ](http://joel-costigliola.github.io/assertj/) for assertions in unit test.
-* [Mockito](https://github.com/mockito/mockito) for mocking in unit test.
-* [Apache Commons Logging](https://commons.apache.org/proper/commons-logging/)  as logging interface.
-
-Built with:
-* [Gradle Build Tool](https://gradle.org/).
-
-## Features
-**Java CQRS CommandBus** is a very lightweight and highly extensible CQRS CommandBus library that help you implement your application layer and CQRS architectural pattern:
-* **Lightweight**: The library comes with 2 distinct core modules: the `commandbus-spec` module and the `commandbus-core` module. The `commandbus-spec` module contains all the public interfaces of the framework, these interfaces are minimized to reduce the dependency of your project on the library, and your project only need to depends on the `commandbus-spec` module. The `commandbus-core` module contains the library’s implementation of the `commandbus-spec` module, your code will not need to depends on this module at all, dependency injection framework will automatically bind the implementation of the `commandbus-core` module to the interfaces in the `commandbus-spec` module. With this design, it’s possible and easy to swap out or reimplement the whole library with minimal efforts without affecting your codebase.
-* **Highly extensible**: We consider extensibility as the core value of the library, so we design it to make it highly extensible via: middleware pipeline. You can inject any custom middleware to intercept the handling of the commands dispatched into the bus.
 
 ## Benefits of using Command Bus
 Command Bus pattern (a.k.a **Command Dispatcher Pattern**) help to:
@@ -38,6 +15,23 @@ Command Bus pattern (a.k.a **Command Dispatcher Pattern**) help to:
 * **Unified communication interface**: With Command Bus pattern, the communication interface of application layer (service layer) is unified into only one method: the `dispatch()` method of Command Bus. This simplified interface will help to increase maintainability.
 * **Handle application layer (service layer) cross-cutting concerns in one place**: Because all the interactions to the system go through the `dispatch()` method of Command Bus, we can easily handle all the application layer (service layer) cross-cutting concerns like: logging, audit-logging, auto-restarting transaction (ex: restart on database deadlock exception), rate-limiting. Because of this, the `middleware pipeline` feature of `Java CQRS CommandBus` will help you to easily add middleware to handle cross-cutting concerns easily, as well as to extend functionalities.
 * **Built-in natural audit-log**: Because all the interactions to the system are modeled as Command (which represent business use-case/intent), the Command naturally represent system audit-log. By adding a middleware to log succeeded command, it naturally becomes the audit-log of the system.
+
+## Features
+**Java CQRS CommandBus** is a very lightweight and highly extensible CQRS CommandBus library that help you implement your application layer and CQRS architectural pattern:
+* **Lightweight**: The library comes with 2 distinct core modules: the `commandbus-spec` module and the `commandbus-core` module. The `commandbus-spec` module contains all the public interfaces of the framework, these interfaces are minimized to reduce the dependency of your project on the library, and your project only need to depends on the `commandbus-spec` module. The `commandbus-core` module contains the library’s implementation of the `commandbus-spec` module, your code will not need to depends on this module at all, dependency injection framework will automatically bind the implementation of the `commandbus-core` module to the interfaces in the `commandbus-spec` module. With this design, it’s possible and easy to swap out or reimplement the whole library with minimal efforts without affecting your codebase.
+* **Highly extensible**: We consider extensibility as the core value of the library, so we design it to make it highly extensible via: middleware pipeline. You can inject any custom middleware to intercept the handling of the commands dispatched into the bus.
+
+
+## Code style
+The project follows [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+
+## Git workflow
+Before v0.3.0, the project uses [Gitflow](https://nvie.com/posts/a-successful-git-branching-model/).
+
+From v0.3.0, the project uses [Trunk-based development](https://trunkbaseddevelopment.com/).
+
+## Versioning
+The project uses [SemVer v2.0.0](https://semver.org/).
 
 ## Integrate into your project
 
