@@ -1,10 +1,11 @@
-# Java CQRS
-[![Build Status](https://travis-ci.com/dathoangse/java-cqrs.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs)
-[![codecov](https://codecov.io/gh/dathoangse/java-cqrs/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs)
+# Java CQRS CommandBus
+[![Build Status](https://travis-ci.com/dathoangse/java-cqrs-commandbus.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs-commandbus)
+[![codecov](https://codecov.io/gh/dathoangse/java-cqrs-commandbus/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs-commandbus)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/core/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/core)
 
-A lightweight & highly extensible CQRS framework for implementing CQRS architectural pattern in java
+A lightweight & highly extensible CQRS framework for implementing application layer and CQRS architectural pattern in Java.
 
-## Who uses Java CQRS
+## Who uses Java CQRS CommandBus
 * [YouthDev](https://youthdev.net/en/)
 
 ## Code style
@@ -14,9 +15,7 @@ The project follows [Google Java Style Guide](https://google.github.io/styleguid
 The project uses [Git flow](https://nvie.com/posts/a-successful-git-branching-model/) for git workflow.
 
 ## Versioning
-The project uses [Semantic Versioning 2.0.0 | Semantic Versioning](https://semver.org/) for versioning releases.
-
-Special note: When the major version of the project is still 0 (ex: v0.1.3), the framework is not ready for production use, and the framework interface is still not stable (which means there might be some breaking changes between minor versions when the major version is still 0).
+The project uses [Semantic Versioning 2.0.0](https://semver.org/) for versioning releases.
 
 ## Libs/frameworks used
 * [JUnit 5](https://junit.org/junit5/) for unit testing.
@@ -27,35 +26,49 @@ Special note: When the major version of the project is still 0 (ex: v0.1.3), the
 Built with:
 * [Gradle Build Tool](https://gradle.org/).
 
-# Features
-`Java CQRS` is a very lightweight and highly extensible CQRS framework that help you implement the CQRS architecture into your project.
-Characteristics:
-1. `Lightweight`: The core interfaces of the framework is minimized, making it easy to swap out the implementation of the whole framework, and you can easily integrate into your project with little efforts.
-2. `Highly extensible`: The lib provide a very high extensibility via a *middleware pipeline* and well-structured modules.
-3. `Architecturally unoptionated`: The framework doesn't make any assumption about the architecture you're building, thus it doesn't force you to design your architecture in a certain architectural style. CQRS can be implemented at different levels & scales, depending on your project requirement.
-So:
-* You can simply take the command bus and use it to implement your application layer to act as a bridge between your UI/presentation layer & domain layer, and simply have the read side (read models/operations) and write side (write models/operations) separated.
-* Or you can take it to the next level and have a separated read database & write database that keep in sync using event projection mechanism, which can help to make the read side massively scalable & extremely high performance.
-* Or you can even design using full-blown CQRS & Event Sourcing architectural pattern that use event store as the single source of truth.
+## Features
+**Java CQRS CommandBus** is a very lightweight and highly extensible CQRS CommandBus library that help you implement your application layer and CQRS architectural pattern:
+* **Lightweight**: The library comes with 2 distinct core modules: the `commandbus-spec` module and the `commandbus-core` module. The `commandbus-spec` module contains all the public interfaces of the framework, these interfaces are minimized to reduce the dependency of your project on the library, and your project only need to depends on the `commandbus-spec` module. The `commandbus-core` module contains the library’s implementation of the `commandbus-spec` module, your code will not need to depends on this module at all, dependency injection framework will automatically bind the implementation of the `commandbus-core` module to the interfaces in the `commandbus-spec` module. With this design, it’s possible and easy to swap out or reimplement the whole library with minimal efforts without affecting your codebase.
+* **Highly extensible**: We consider extensibility as the core value of the library, so we design it to make it highly extensible via: middleware pipeline. You can inject any custom middleware to intercept the handling of the commands dispatched into the bus.
 
-## Build
-To build, run the command in terminal at the root of the project:
+## Benefits of using Command Bus
+Command Bus pattern (a.k.a **Command Dispatcher Pattern**) help to:
+* **Decouple architecture from framework**: Good architecture does not depend on framework, it also does not depends on how the system is used (Our architecture should be the same whether we’re building a Restful API, WebSocket, TCP-socket or CLI applications.). By modeling all the interactions (business use-case) via Commands, application layer (or service layer) no longer need to depend on framework, and it also doesn’t depend on the protocol which was used to communicate with the system.
+* **Make the architecture scream**: Good architecture is the screaming architecture, which means we can easily know the system use-cases just by looking at the architecture. By presenting all the business user-case/intent and user interaction (with the system) via Command, we can quickly understand what the system can do just by looking at all the Commands available in the system, thus all the Commands have already screamed about the system use-cases.
+* **Unified communication interface**: With Command Bus pattern, the communication interface of application layer (service layer) is unified into only one method: the `dispatch()` method of Command Bus. This simplified interface will help to increase maintainability.
+* **Handle application layer (service layer) cross-cutting concerns in one place**: Because all the interactions to the system go through the `dispatch()` method of Command Bus, we can easily handle all the application layer (service layer) cross-cutting concerns like: logging, audit-logging, auto-restarting transaction (ex: restart on database deadlock exception), rate-limiting. Because of this, the `middleware pipeline` feature of `Java CQRS CommandBus` will help you to easily add middleware to handle cross-cutting concerns easily, as well as to extend functionalities.
+* **Built-in natural audit-log**: Because all the interactions to the system are modeled as Command (which represent business use-case/intent), the Command naturally represent system audit-log. By adding a middleware to log succeeded command, it naturally becomes the audit-log of the system.
+
+## Integrate into your project
+
+### For maven project
+
+Add the dependency:
+
 ```
-./gradlew clean build
+<dependency>
+    <groupId>net.dathoang.cqrs.commandbus</groupId>
+    <artifactId>core</artifactId>
+    <version>0.1.0</version>
+    <type>pom</type>
+</dependency>
 ```
 
-## Tests
-To run unit test, run the command in terminal at the root of the project:
+### For gradle project
+
+Add the dependency:
+
 ```
-./gradlew clean test
+compile group: 'net.dathoang.cqrs.commandbus', name: 'core', version: '0.1.0', ext: 'pom'
 ```
 
 ## Contribute
 We welcome all contributions.
-Please fork the repository and base your work on `develop` branch.
+Please fork the repository and base your work on **develop** branch.
 Before creating pull request, please make sure:
 * All tests passed.
 * There is 100% code coverage on all new codes.
 
 ## License
-Java CQRS is an Open Source Software released under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0.html)
+Java CQRS CommandBus is an Open Source Software released under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0.html)
+

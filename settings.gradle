@@ -8,6 +8,10 @@
  */
 
 rootProject.name = 'java-cqrs-commandbus'
-include 'core'
-include 'simple-middlewares'
+include 'commandbus-core'
+include 'commandbus-basic-middleware'
+include 'commandbus-spec'
+include 'commandbus-spring'
+include 'commandbus-core-full'
+include 'commandbus-spring-full'
 

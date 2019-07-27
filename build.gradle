@@ -15,18 +15,11 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    compile project(':core')
-    compile project(':simple-middlewares')
-}
-
 allprojects {
     apply plugin: 'jacoco'
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
     apply plugin: 'findbugs'
-    apply plugin: 'maven-publish'
-    apply plugin: 'signing'
 
     checkstyle {
         toolVersion = '8.18'
@@ -59,105 +52,11 @@ allprojects {
             options.compilerArgs << "-Werror"
         }
     }
+}
 
-    task sourceJar(type: Jar) {
-        classifier "sources"
-        from sourceSets.main.allJava
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        classifier "javadoc"
-        from javadoc.destinationDir
-    }
-
-    artifacts {
-        archives jar
-        archives sourceJar
-        archives javadocJar
-    }
-
-    publishing {
-        publications {
-            mavenJava(MavenPublication) {
-                customizePom(pom)
-                groupId 'net.dathoang.cqrs.commandbus'
-                version '0.1.1'
-
-                from components.java
-
-                artifact(sourceJar) {
-                    classifier = 'sources'
-                }
-                artifact(javadocJar) {
-                    classifier = 'javadoc'
-                }
-
-                // Create the sign pom artifact
-                pom.withXml {
-                    def pomFile = file("${project.buildDir}/generated-pom.xml")
-                    writeTo(pomFile)
-                    def pomAscFile = signing.sign(pomFile).signatureFiles[0]
-                    artifact(pomAscFile) {
-                        classifier = null
-                        extension = 'pom.asc'
-                    }
-                }
-
-                // Create the signed artifacts
-                project.tasks.signArchives.signatureFiles.each {
-                    artifact(it) {
-                        def matcher = it.file =~ /-(sources|javadoc)\.jar\.asc$/
-                        if (matcher.find()) {
-                            classifier = matcher.group(1)
-                        } else {
-                            classifier = null
-                        }
-                        extension = 'jar.asc'
-                    }
-                }
-            }
-        }
-        repositories {
-            maven {
-                if (project.properties['SNAPSHOT'] != 'true') {
-                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                } else {
-                    url "https://oss.sonatype.org/content/repositories/snapshots"
-                }
-                credentials {
-                    username project.properties['CQRS_COMMANDBUS_SONATYPE_USERNAME']
-                    password project.properties['CQRS_COMMANDBUS_SONATYPE_PASSWORD']
-                }
-            }
-        }
-    }
-
-    model {
-        tasks.generatePomFileForMavenJavaPublication {
-            destination = file("$buildDir/generated-pom.xml")
-        }
-
-        tasks.publishMavenJavaPublicationToMavenLocal {
-            dependsOn project.tasks.signArchives
-        }
-        tasks.publishMavenJavaPublicationToMavenRepository {
-            dependsOn project.tasks.signArchives
-        }
-    }
-
-    signing {
-        sign configurations.archives
-    }
-
-    gradle.taskGraph.whenReady { taskGraph ->
-        if (taskGraph.allTasks.any { it instanceof Sign }) {
-            allprojects {
-                ext."signing.keyId" = project.properties['CQRS_COMMANDBUS_SIGNING_KEY_ID']
-                ext."signing.secretKeyRingFile" = project.properties['CQRS_COMMANDBUS_SECRET_KEYRING_FILE']
-                ext."signing.password" = project.properties['CQRS_COMMANDBUS_SIGNING_PASSWORD']
-            }
-        }
-    }
+subprojects {
+    apply plugin: 'maven-publish'
+    apply plugin: 'signing'
 }
 
 def customizePom(pom) {

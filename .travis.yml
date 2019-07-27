@@ -2,7 +2,7 @@ language: java
 install: true
 
 jdk:
-  - oraclejdk8
+  - openjdk8
 
 stages:
   - analyze
@@ -35,13 +35,13 @@ jobs:
       if: tag =~ ^v
       script:
         - ./prepare_before_publish
-        - ./gradlew core:publish
+        - ./gradlew publish
         - ./cleanup_after_publish
 
-    # - stage: release
-    #   name: "Publish snapshot"
-    #   if: branch =~ ^(hotfix|release)\/.*
-    #   script:
-    #     - ./prepare_before_publish
-    #     - ./gradlew core:publish -PSNAPSHOT=true
-    #     - ./cleanup_after_publish
+    - stage: release
+      name: "Publish snapshot"
+      if: branch =~ ^(develop|hotfix|release).*
+      script:
+        - ./prepare_before_publish
+        - ./gradlew publish -PSNAPSHOT=true
+        - ./cleanup_after_publish
