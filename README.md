@@ -28,7 +28,7 @@ The project follows [Google Java Style Guide](https://google.github.io/styleguid
 ## Git workflow
 Before v0.3.0, the project uses [Gitflow](https://nvie.com/posts/a-successful-git-branching-model/).
 
-From v0.3.0, the project uses [Trunk-based development](https://trunkbaseddevelopment.com/).
+From v0.3.0, the project uses [Trunk-based development](https://trunkbaseddevelopment.com/), and **develop** branch will be used as trunk (instead of **master**)
 
 ## Versioning
 The project uses [SemVer v2.0.0](https://semver.org/).
