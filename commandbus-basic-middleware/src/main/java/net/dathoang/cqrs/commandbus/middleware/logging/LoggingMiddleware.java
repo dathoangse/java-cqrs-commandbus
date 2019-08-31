@@ -29,7 +29,7 @@ public class LoggingMiddleware implements Middleware {
     } else {
       String resultInStr = resultAndExceptionHolder.getResult() != null
           ? resultAndExceptionHolder.getResult().toString() : "null";
-      log.error(String.format("The %s %s (%s) has been handled successfully with result: %s",
+      log.info(String.format("The %s %s (%s) has been handled successfully with result: %s",
           getMessageType(message), message.getClass().getName(), message.toString(), resultInStr));
     }
   }
