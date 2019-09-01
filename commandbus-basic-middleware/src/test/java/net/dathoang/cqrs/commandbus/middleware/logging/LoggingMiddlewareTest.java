@@ -6,12 +6,13 @@ import static org.mockito.Mockito.mock;
 
 import net.dathoang.cqrs.commandbus.command.Command;
 import net.dathoang.cqrs.commandbus.message.Message;
-import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
+import net.dathoang.cqrs.commandbus.middleware.NextFunction;
 import net.dathoang.cqrs.commandbus.query.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
 
 class LoggingMiddlewareTest {
   @Nested
@@ -27,7 +28,7 @@ class LoggingMiddlewareTest {
 
       // Act
       Throwable ex = catchThrowable(() ->
-          middleware.preHandle(message, new ResultAndExceptionHolder<>()));
+          middleware.handle(message, (handlingMessage) -> null));
 
       // Assert
       assertThat(ex)
@@ -46,35 +47,37 @@ class LoggingMiddlewareTest {
       // Arrange
       Message<Object> message = createDummyMessage(messageType);
       LoggingMiddleware middleware = new LoggingMiddleware();
-      ResultAndExceptionHolder<Object> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
-      resultAndExceptionHolder.setException(new RuntimeException());
+      Exception exceptionRaisedByNextMiddleware = new Exception("Exception raised in next middleware");
+      NextFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> {
+        throw exceptionRaisedByNextMiddleware;
+      };
 
       // Act
-      Throwable ex = catchThrowable(() -> middleware.postHandle(message, resultAndExceptionHolder));
+      Throwable realException = catchThrowable(() -> middleware.handle(message, nextFunc));
 
       // Assert
-      assertThat(ex)
-          .describedAs("should not throw exception")
-          .isNull();
+      assertThat(realException)
+          .describedAs("should throw the same exception as the exception raised by next middleware")
+          .isEqualTo(exceptionRaisedByNextMiddleware);
     }
 
     @ParameterizedTest
     @ValueSource(strings = {"message", "command", "query"})
     @DisplayName("should log successfully when received result")
-    void shouldLogSuccessfullyWhenReceivedResult(String messageType) {
+    void shouldLogSuccessfullyWhenReceivedResult(String messageType) throws Exception {
       // Arrange
       Message<Object> message = createDummyMessage(messageType);
+      Object dummyResult = new Object();
       LoggingMiddleware middleware = new LoggingMiddleware();
-      ResultAndExceptionHolder<Object> resultAndExceptionHolder = new ResultAndExceptionHolder<>();
-      resultAndExceptionHolder.setResult(new Object());
+      NextFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> dummyResult;
 
       // Act
-      Throwable ex = catchThrowable(() -> middleware.postHandle(message, resultAndExceptionHolder));
+      Object realResult = middleware.handle(message, nextFunc);
 
       // Assert
-      assertThat(ex)
-          .describedAs("should not throw exception")
-          .isNull();
+      assertThat(realResult)
+          .describedAs("should return the same result as the result of next middleware")
+          .isEqualTo(dummyResult);
     }
   }
 

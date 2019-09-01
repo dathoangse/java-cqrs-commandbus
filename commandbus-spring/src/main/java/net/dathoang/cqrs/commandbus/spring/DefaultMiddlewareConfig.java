@@ -3,7 +3,6 @@ package net.dathoang.cqrs.commandbus.spring;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
 import net.dathoang.cqrs.commandbus.middleware.logging.LoggingMiddleware;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
