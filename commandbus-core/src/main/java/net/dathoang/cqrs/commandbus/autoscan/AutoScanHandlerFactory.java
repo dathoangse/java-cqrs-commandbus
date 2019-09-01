@@ -13,15 +13,17 @@ import org.reflections.Reflections;
 import java.util.*;
 import java.util.function.Function;
 
+import static java.util.Arrays.asList;
+
 public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, CommandHandlerFactory {
   private static final Log log = LogFactory.getLog(AutoScanHandlerFactory.class);
 
   private Map<String, Class<? extends QueryHandler>> handlerClassByQueryNameMap = new HashMap<>();
   private Map<String, Class<? extends CommandHandler>> handlerClassByCommandNameMap = new HashMap<>();
 
-  public AutoScanHandlerFactory() {}
+  protected AutoScanHandlerFactory() {}
 
-  public void startScanningHandler() {
+  protected void startScanningHandler() {
     try {
       scanHandlers();
     } catch (Exception ex) {
@@ -36,8 +38,17 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
     Set<Class<? extends CommandHandler>> commandClasses = reflections.getSubTypesOf(CommandHandler.class);
 
     queryClasses.forEach(queryClass -> {
+      QueryMappings multiMappingAnnotation = queryClass.getAnnotation(QueryMappings.class);
       QueryMapping mappingAnnotation = queryClass.getAnnotation(QueryMapping.class);
-      if (mappingAnnotation != null) {
+      if (multiMappingAnnotation != null) {
+        List<QueryMapping> queryMappings = asList(multiMappingAnnotation.value());
+        queryMappings.forEach(queryMapping -> {
+          log.info(String.format("Registering handler %s to handle the query %s",
+              queryClass.getSimpleName(), queryMapping.value().getName()));
+
+          handlerClassByQueryNameMap.put(queryMapping.value().getName(), queryClass);
+        });
+      } else if (mappingAnnotation != null) {
         log.info(String.format("Registering handler %s to handle the query %s",
             queryClass.getSimpleName(), mappingAnnotation.value().getName()));
 
@@ -46,8 +57,17 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
     });
 
     commandClasses.forEach(commandClass -> {
+      CommandMappings multiMappingAnnotation = commandClass.getAnnotation(CommandMappings.class);
       CommandMapping mappingAnnotation = commandClass.getAnnotation(CommandMapping.class);
-      if (mappingAnnotation != null) {
+      if (multiMappingAnnotation != null) {
+        List<CommandMapping> commandMappings = asList(multiMappingAnnotation.value());
+        commandMappings.forEach(commandMapping -> {
+          log.info(String.format("Registering handler %s to handle the command %s",
+              commandClass.getSimpleName(), commandMapping.value().getName()));
+
+          handlerClassByCommandNameMap.put(commandMapping.value().getName(), commandClass);
+        });
+      } else if (mappingAnnotation != null) {
         log.info(String.format("Registering handler %s to handle the command %s",
             commandClass.getSimpleName(), mappingAnnotation.value().getName()));
 
@@ -64,9 +84,8 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
       return null;
     }
 
-    return QueryHandler.class.cast(getBeanFactory().apply(handlerClass));
+    return (QueryHandler) getBeanFactory().apply(handlerClass);
   }
-
 
   @SuppressWarnings("unchecked")
   @Override
@@ -76,7 +95,7 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
       return null;
     }
 
-    return CommandHandler.class.cast(getBeanFactory().apply(handlerClass));
+    return (CommandHandler) getBeanFactory().apply(handlerClass);
   }
 
   protected abstract Function<Class, Object> getBeanFactory();
