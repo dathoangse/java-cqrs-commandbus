@@ -4,14 +4,13 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
 
+import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.middleware.NextFunction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,9 +33,9 @@ class DefaultCommandBusTest {
       doReturn(dummyCommandHandler)
           .when(commandHandlerFactory).createCommandHandler(dummyCommand.getClass().getName());
       List<Middleware> middlewareList = asList(
-          mock(Middleware.class),
-          mock(Middleware.class),
-          mock(Middleware.class)
+          spy(new DummyMiddleware()),
+          spy(new DummyMiddleware()),
+          spy(new DummyMiddleware())
       );
       CommandBus commandBus = new DefaultCommandBus(commandHandlerFactory, middlewareList);
 
@@ -44,12 +43,10 @@ class DefaultCommandBusTest {
       Object commandBusResult = commandBus.dispatch(dummyCommand);
 
       // Assert
-      middlewareList.forEach(middleware -> {
+      for (Middleware middleware : middlewareList) {
         verify(middleware, times(1))
-            .preHandle(eq(dummyCommand), any());
-        verify(middleware, times(1))
-            .postHandle(eq(dummyCommand), any());
-      });
+            .handle(eq(dummyCommand), any());
+      }
       verify(dummyCommandHandler, times(1))
           .handle(dummyCommand);
       assertThat(commandBusResult)
@@ -63,4 +60,11 @@ class DefaultCommandBusTest {
   class DummyCommand implements Command<Object> {}
 
   abstract class DummyCommandHandler implements CommandHandler<DummyCommand, Object> {}
+
+  static class DummyMiddleware implements Middleware {
+    @Override
+    public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+      return next.call(message);
+    }
+  }
 }

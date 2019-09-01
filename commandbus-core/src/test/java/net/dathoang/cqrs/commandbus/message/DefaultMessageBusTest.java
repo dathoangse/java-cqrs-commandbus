@@ -16,10 +16,7 @@ import static org.mockito.Mockito.verify;
 
 import java.util.List;
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
-import net.dathoang.cqrs.commandbus.middleware.Middleware;
-import net.dathoang.cqrs.commandbus.middleware.MiddlewareContext;
-import net.dathoang.cqrs.commandbus.middleware.PipelineContextContainer;
-import net.dathoang.cqrs.commandbus.middleware.ResultAndExceptionHolder;
+import net.dathoang.cqrs.commandbus.middleware.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -44,9 +41,9 @@ class DefaultMessageBusTest {
       messageHandlerFactoryMock = mock(MessageHandlerFactory.class);
       dummyMessage = new DummyMessage();
       mockMessageHandler = mock(DummyMessageHandler.class);
-      middleware1 = mock(Middleware.class);
-      middleware2 = mock(Middleware.class);
-      middleware3 = mock(Middleware.class);
+      middleware1 = spy(new DummyMiddleware());
+      middleware2 = spy(new DummyMiddleware());
+      middleware3 = spy(new DummyMiddleware());
       messageBus = new DefaultMessageBus(messageHandlerFactoryMock, asList(
           middleware1,
           middleware2,
@@ -72,16 +69,13 @@ class DefaultMessageBusTest {
 
     @Test
     @DisplayName("should short-circuit and raise exception when middleware raise exception")
-    void shouldShortCircuitAndRaiseTheExceptionWhenMiddlewareRaiseException() {
-      Exception exceptionToRaise = new Exception();
+    void shouldShortCircuitAndRaiseTheExceptionWhenMiddlewareRaiseException() throws Exception {
+      Exception exceptionToRaise = new RuntimeException("Exception raised by middleware2");
 
       // Arrange
       doAnswer(invocation -> {
-        ResultAndExceptionHolder resultAndExceptionHolder =
-            (ResultAndExceptionHolder) invocation.getArguments()[1];
-        resultAndExceptionHolder.setException(exceptionToRaise);
-        return null;
-      }).when(middleware2).preHandle(eq(dummyMessage), any());
+        throw exceptionToRaise;
+      }).when(middleware2).handle(eq(dummyMessage), any());
 
       // Act
       Throwable messageBusException = catchThrowable(() -> messageBus.dispatch(dummyMessage));
@@ -102,11 +96,8 @@ class DefaultMessageBusTest {
 
       // Arrange
       doAnswer(invocation -> {
-        ResultAndExceptionHolder resultAndExceptionHolder =
-            (ResultAndExceptionHolder)invocation.getArguments()[1];
-        setResultToResultHolder(resultToRaise, resultAndExceptionHolder);
-        return null;
-      }).when(middleware2).preHandle(eq(dummyMessage), any());
+        return resultToRaise;
+      }).when(middleware2).handle(eq(dummyMessage), any());
 
       // Act
       Object realResult = messageBus.dispatch(dummyMessage);
@@ -116,47 +107,6 @@ class DefaultMessageBusTest {
       verifyMiddlewareNotCalled(middleware3);
       assertThat(realResult).as("Real result")
           .isEqualTo(resultToRaise);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void setResultToResultHolder(Object resultToRaise,
-        ResultAndExceptionHolder resultAndExceptionHolder) {
-      resultAndExceptionHolder.setResult(resultToRaise);
-    }
-
-    @Test
-    @DisplayName("should not short-circuit or raise exception when there is unexpected exception "
-        + "in middleware")
-    void shouldNotShortCircuitAndRaiseExceptionWhenThereIsUnexpectedException() throws Exception {
-      // Arrange
-      doThrow(new RuntimeException())
-          .when(middleware1).preHandle(any(), any());
-      doThrow(new RuntimeException())
-          .when(middleware2).preHandle(any(), any());
-
-      // Act
-      messageBus.dispatch(dummyMessage);
-
-      // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyMessage);
-    }
-
-    @Test
-    @DisplayName("should safely bypass unhandled exceptions raised by middleware.postHandle()")
-    void shouldSafelyBypassUnhandledExceptionsRaisedByMiddlewarePostHandler() throws Exception {
-      // Arrange
-      doThrow(new RuntimeException())
-          .when(middleware1).postHandle(any(), any());
-      doThrow(new RuntimeException())
-          .when(middleware2).postHandle(any(), any());
-      doThrow(new RuntimeException())
-          .when(middleware3).postHandle(any(), any());
-
-      // Act
-      messageBus.dispatch(dummyMessage);
-
-      // Assert
-      verifyMiddlewareCallOnce(asList(middleware1, middleware2, middleware3), dummyMessage);
     }
 
     @Test
@@ -187,201 +137,30 @@ class DefaultMessageBusTest {
           .describedAs("Message bus result should be equals to message handler result");
     }
 
-    @Test
-    @DisplayName("should allow middleware to alter message handler's result")
-    void shouldAllowMiddlewareToAlterMessageHandlerResult() throws Exception {
-      // Arrange
-      Object middlewareResult = new Object();
-      doAnswer(answer -> {
-        setResultToResultHolder(middlewareResult,
-            (ResultAndExceptionHolder)answer.getArguments()[1]);
-        return null;
-      }).when(middleware2).postHandle(eq(dummyMessage), any());
-
-      // Act
-      Object messageBusResult = messageBus.dispatch(dummyMessage);
-
-      // Assert
-      assertThat(messageBusResult).isEqualTo(middlewareResult)
-          .describedAs("Message bus result should be equal to middleware result instead "
-              + "of message handler result");
+    private void verifyMiddlewareCallOnce(Middleware middleware, DummyMessage message) throws Exception {
+      verify(middleware, times(1)).handle(eq(message), any());
     }
 
-    @Test
-    @DisplayName("should allow middleware to catch message handler's exception in the pipeline")
-    void shouldAllowMiddlewareToCatchMessageHandlerException() throws Exception {
-      // Arrange
-      doThrow(new Exception())
-          .when(mockMessageHandler).handle(dummyMessage);
-      doAnswer(answer -> {
-        // Catch exception in the pipeline by setting exception to null in exception holder
-        ((ResultAndExceptionHolder)answer.getArguments()[1]).setException(null);
-        return null;
-      }).when(middleware2).postHandle(eq(dummyMessage), any());
-
-      // Act
-      Throwable messageBusException = catchThrowable(() -> messageBus.dispatch(dummyMessage));
-
-      // Assert
-      assertThat(messageBusException).isEqualTo(null)
-          .describedAs("Message bus should not throw exception");
+    private void verifyMiddlewareCallOnce(List<Middleware> middlewares, DummyMessage message) throws Exception {
+      for (Middleware middleware : middlewares) {
+        verifyMiddlewareCallOnce(middleware, message);
+      }
     }
 
-    @Test
-    @DisplayName("should inject middleware context successfully into inner middlewares and "
-        + "message handler")
-    void shouldInjectMiddlewareContextSuccessfullyIntoInnerMiddlewaresAndMessageHandler()
-        throws Exception {
-      // Arrange
-      MiddlewareContextA contextAToInject = new MiddlewareContextA();
-      MiddlewareContextB contextBToInject = new MiddlewareContextB();
-      MiddlewareA middlewareA = spy(new MiddlewareA(contextAToInject));
-      MiddlewareB middlewareB = spy(new MiddlewareB(contextBToInject));
-      MiddlewareC middlewareC = spy(new MiddlewareC());
-      DummyInjectedMessageHandler messageHandler = spy(new DummyInjectedMessageHandler());
-      DummyMessage dummyMessage = new DummyMessage();
-      MessageHandlerFactory messageHandlerFactory = mock(MessageHandlerFactory.class);
-      doReturn(messageHandler)
-          .when(messageHandlerFactory).createHandler(dummyMessage.getClass().getName());
-      messageBus = new DefaultMessageBus(messageHandlerFactory, asList(
-          middlewareA,
-          middlewareB,
-          middlewareC
-      ));
-
-      // Act
-      messageBus.dispatch(new DummyMessage());
-
-      // Assert
-      assertThat(getDeclaredFieldValue(middlewareA, "contextContainer"))
-          .isNotNull();
-
-      assertThat(getDeclaredFieldValue(middlewareB, "contextContainer"))
-          .isNotNull();
-      assertThat(getDeclaredFieldValue(middlewareB, "contextA"))
-          .isEqualTo(contextAToInject);
-
-      assertThat(getDeclaredFieldValue(middlewareC, "contextA"))
-          .isEqualTo(contextAToInject);
-      assertThat(getDeclaredFieldValue(middlewareC, "contextB"))
-          .isEqualTo(contextBToInject);
-      verify(middlewareC, times(1))
-          .setUpDependency(contextAToInject, contextBToInject);
-
-      assertThat(getDeclaredFieldValue(messageHandler, "contextA"))
-          .isEqualTo(contextAToInject);
-      assertThat(getDeclaredFieldValue(messageHandler, "contextB"))
-          .isEqualTo(contextBToInject);
-      verify(messageHandler, times(1))
-          .setUpDependency(contextAToInject, contextBToInject);
-    }
-
-    private void verifyMiddlewareCallOnce(Middleware middleware, DummyMessage message) {
-      verify(middleware, times(1)).preHandle(eq(message), any());
-      verify(middleware, times(1)).postHandle(eq(message), any());
-    }
-
-    private void verifyMiddlewareCallOnce(List<Middleware> middlewares, DummyMessage message) {
-      middlewares.forEach(middleware -> verifyMiddlewareCallOnce(middleware, message));
-    }
-
-    private void verifyMiddlewareNotCalled(Middleware middleware) {
-      verify(middleware, times(0)).preHandle(any(), any());
-      verify(middleware, times(0)).postHandle(any(), any());
+    private void verifyMiddlewareNotCalled(Middleware middleware) throws Exception {
+      verify(middleware, times(0)).handle(any(), any());
     }
   }
 
   // region Dummy classes
   static class DummyMessage implements Message<Object> {}
 
+  static class DummyMiddleware implements Middleware {
+    @Override
+    public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+      return next.call(message);
+    }
+  }
+
   abstract class DummyMessageHandler implements MessageHandler<DummyMessage, Object> { }
-
-  static class MiddlewareA implements Middleware {
-    @MiddlewareContext
-    private PipelineContextContainer contextContainer;
-    private MiddlewareContextA contextAToInject;
-
-    MiddlewareA(
-        MiddlewareContextA contextAToInject) {
-      this.contextAToInject = contextAToInject;
-    }
-
-    @Override
-    public <R> void preHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-      contextContainer.bindContext(MiddlewareContextA.class, contextAToInject);
-    }
-
-    @Override
-    public <R> void postHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    }
-  }
-
-  static class MiddlewareB implements Middleware {
-    @MiddlewareContext
-    private PipelineContextContainer contextContainer;
-    @MiddlewareContext
-    private MiddlewareContextA contextA;
-    private MiddlewareContextB contextBToInject;
-
-    MiddlewareB(MiddlewareContextB contextBToInject) {
-      this.contextBToInject = contextBToInject;
-    }
-
-    @Override
-    public <R> void preHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-      contextContainer.bindContext(MiddlewareContextB.class, contextBToInject);
-    }
-
-    @Override
-    public <R> void postHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    }
-  }
-
-  static class MiddlewareC implements Middleware {
-    @MiddlewareContext
-    private MiddlewareContextA contextA;
-    @MiddlewareContext
-    private MiddlewareContextB contextB;
-
-    @MiddlewareContext
-    protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
-
-    }
-
-    @Override
-    public <R> void preHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    }
-
-    @Override
-    public <R> void postHandle(Message<R> message,
-        ResultAndExceptionHolder<R> resultAndExceptionHolder) {
-    }
-  }
-
-  static class DummyInjectedMessageHandler implements MessageHandler<DummyMessage, Object> {
-    @MiddlewareContext
-    private MiddlewareContextA contextA;
-    @MiddlewareContext
-    private MiddlewareContextB contextB;
-
-    @MiddlewareContext
-    protected void setUpDependency(MiddlewareContextA contextA, MiddlewareContextB contextB) {
-
-    }
-
-    @Override
-    public Void handle(DummyMessage message) throws Exception {
-      return null;
-    }
-  }
-
-  private class MiddlewareContextA {}
-
-  private class MiddlewareContextB {}
-  // endregion
 }

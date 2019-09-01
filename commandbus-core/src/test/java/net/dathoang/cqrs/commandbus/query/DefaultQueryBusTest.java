@@ -4,13 +4,13 @@ import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.List;
+
+import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
+import net.dathoang.cqrs.commandbus.middleware.NextFunction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,9 @@ class DefaultQueryBusTest {
       doReturn(dummyQueryHandler)
           .when(queryHandlerFactory).createQueryHandler(dummyQuery.getClass().getName());
       List<Middleware> middlewareList = asList(
-          mock(Middleware.class),
-          mock(Middleware.class),
-          mock(Middleware.class)
+          spy(new DummyMiddleware()),
+          spy(new DummyMiddleware()),
+          spy(new DummyMiddleware())
       );
       QueryBus queryBus = new DefaultQueryBus(queryHandlerFactory, middlewareList);
 
@@ -43,12 +43,10 @@ class DefaultQueryBusTest {
       Object queryBusResult = queryBus.dispatch(dummyQuery);
 
       // Assert
-      middlewareList.forEach(middleware -> {
+      for (Middleware middleware : middlewareList) {
         verify(middleware, times(1))
-            .preHandle(eq(dummyQuery), any());
-        verify(middleware, times(1))
-            .postHandle(eq(dummyQuery), any());
-      });
+            .handle(eq(dummyQuery), any());
+      }
       verify(dummyQueryHandler, times(1))
           .handle(dummyQuery);
       assertThat(queryBusResult)
@@ -62,5 +60,12 @@ class DefaultQueryBusTest {
   class DummyQuery implements Query<Object> {}
 
   abstract class DummyQueryHandler implements
-      QueryHandler<DummyQuery, Object> {}
+      QueryHandler<DummyQuery, Object> { }
+
+  static class DummyMiddleware implements Middleware {
+    @Override
+    public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+      return next.call(message);
+    }
+  }
 }
