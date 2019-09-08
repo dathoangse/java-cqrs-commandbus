@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 
 import net.dathoang.cqrs.commandbus.command.Command;
 import net.dathoang.cqrs.commandbus.message.Message;
-import net.dathoang.cqrs.commandbus.middleware.NextFunction;
+import net.dathoang.cqrs.commandbus.middleware.NextMiddlewareFunction;
 import net.dathoang.cqrs.commandbus.query.Query;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -48,7 +48,7 @@ class LoggingMiddlewareTest {
       Message<Object> message = createDummyMessage(messageType);
       LoggingMiddleware middleware = new LoggingMiddleware();
       Exception exceptionRaisedByNextMiddleware = new Exception("Exception raised in next middleware");
-      NextFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> {
+      NextMiddlewareFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> {
         throw exceptionRaisedByNextMiddleware;
       };
 
@@ -69,7 +69,7 @@ class LoggingMiddlewareTest {
       Message<Object> message = createDummyMessage(messageType);
       Object dummyResult = new Object();
       LoggingMiddleware middleware = new LoggingMiddleware();
-      NextFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> dummyResult;
+      NextMiddlewareFunction<Message<Object>, Object> nextFunc = (handlingMessage) -> dummyResult;
 
       // Act
       Object realResult = middleware.handle(message, nextFunc);

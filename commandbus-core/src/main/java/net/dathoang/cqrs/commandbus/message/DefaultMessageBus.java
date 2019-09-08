@@ -2,7 +2,7 @@ package net.dathoang.cqrs.commandbus.message;
 
 import net.dathoang.cqrs.commandbus.exceptions.NoHandlerFoundException;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
-import net.dathoang.cqrs.commandbus.middleware.NextFunction;
+import net.dathoang.cqrs.commandbus.middleware.NextMiddlewareFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public final class DefaultMessageBus implements MessageBus {
     return (R)getNext(FIRST_MIDDLEWARE_INDEX).call((Message<Object>)message);
   }
 
-  private <R> NextFunction<Message<R>, R> getNext(int nextMiddlewareIndex) {
+  private <R> NextMiddlewareFunction<Message<R>, R> getNext(int nextMiddlewareIndex) {
     if (nextMiddlewareIndex < middlewarePipeline.size()) {
       // Handle using next middleware
       return (message) -> {

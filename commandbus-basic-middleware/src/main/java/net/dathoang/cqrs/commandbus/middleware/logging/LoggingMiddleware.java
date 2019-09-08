@@ -3,7 +3,7 @@ package net.dathoang.cqrs.commandbus.middleware.logging;
 import net.dathoang.cqrs.commandbus.command.Command;
 import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
-import net.dathoang.cqrs.commandbus.middleware.NextFunction;
+import net.dathoang.cqrs.commandbus.middleware.NextMiddlewareFunction;
 import net.dathoang.cqrs.commandbus.query.Query;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -12,7 +12,7 @@ public class LoggingMiddleware implements Middleware {
   private static final Log log = LogFactory.getLog(LoggingMiddleware.class);
 
   @Override
-  public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+  public <R> R handle(Message<R> message, NextMiddlewareFunction<Message<R>, R> next) throws Exception {
     log.info(String.format("Received %s (%s), the %s has been dispatched to %s bus",
         message.getClass().getName(), message.toString(), getMessageType(message),
         getMessageType(message)));

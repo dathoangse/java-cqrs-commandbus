@@ -15,23 +15,19 @@ import java.util.function.Function;
 
 import static java.util.Arrays.asList;
 
-public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, CommandHandlerFactory {
+public class AutoScanHandlerFactory implements QueryHandlerFactory, CommandHandlerFactory {
   private static final Log log = LogFactory.getLog(AutoScanHandlerFactory.class);
 
   private Map<String, Class<? extends QueryHandler>> handlerClassByQueryNameMap = new HashMap<>();
   private Map<String, Class<? extends CommandHandler>> handlerClassByCommandNameMap = new HashMap<>();
 
-  protected AutoScanHandlerFactory() {}
+  private BeanFactory beanFactory;
 
-  protected void startScanningHandler() {
-    try {
-      scanHandlers();
-    } catch (Exception ex) {
-      log.error("Error while scanning packages for query handlers", ex);
-    }
+  protected AutoScanHandlerFactory(BeanFactory beanFactory) {
+    this.beanFactory = beanFactory;
   }
 
-  private void scanAndRegisterHandler(String packageToScan) {
+  public void scanAndRegisterHandlers(String packageToScan) {
     log.info("Scanning query & command handlers in the package: " + packageToScan);
     Reflections reflections = new Reflections(packageToScan);
     Set<Class<? extends QueryHandler>> queryClasses = reflections.getSubTypesOf(QueryHandler.class);
@@ -84,7 +80,7 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
       return null;
     }
 
-    return (QueryHandler) getBeanFactory().apply(handlerClass);
+    return beanFactory.createBean(handlerClass);
   }
 
   @SuppressWarnings("unchecked")
@@ -95,23 +91,6 @@ public abstract class AutoScanHandlerFactory implements QueryHandlerFactory, Com
       return null;
     }
 
-    return (CommandHandler) getBeanFactory().apply(handlerClass);
-  }
-
-  protected abstract Function<Class, Object> getBeanFactory();
-
-  protected abstract Set<String> getPackagesToScanConfig();
-
-  private void scanHandlers() {
-    // Get packages to scan via annotation
-    Set<String> packagesToScan = getPackagesToScanConfig();
-
-    if (packagesToScan.isEmpty()) {
-      log.warn("No packages to scan for query handlers. Please put the packages to scan in @ComponentScan annotation of SpringBootApplication class.");
-    }
-    packagesToScan.forEach(packageToScan -> {
-      log.info("Scanning query handler in the package " + packageToScan);
-      scanAndRegisterHandler(packageToScan);
-    });
+    return beanFactory.createBean(handlerClass);
   }
 }

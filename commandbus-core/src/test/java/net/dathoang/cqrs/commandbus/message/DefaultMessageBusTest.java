@@ -1,7 +1,6 @@
 package net.dathoang.cqrs.commandbus.message;
 
 import static java.util.Arrays.asList;
-import static net.dathoang.cqrs.commandbus.message.ReflectionUtils.getDeclaredFieldValue;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.Mockito.any;
@@ -157,7 +156,7 @@ class DefaultMessageBusTest {
 
   static class DummyMiddleware implements Middleware {
     @Override
-    public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+    public <R> R handle(Message<R> message, NextMiddlewareFunction<Message<R>, R> next) throws Exception {
       return next.call(message);
     }
   }
