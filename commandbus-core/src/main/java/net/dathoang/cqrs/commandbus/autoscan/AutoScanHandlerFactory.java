@@ -23,7 +23,7 @@ public class AutoScanHandlerFactory implements QueryHandlerFactory, CommandHandl
 
   private BeanFactory beanFactory;
 
-  protected AutoScanHandlerFactory(BeanFactory beanFactory) {
+  public AutoScanHandlerFactory(BeanFactory beanFactory) {
     this.beanFactory = beanFactory;
   }
 
