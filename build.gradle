@@ -11,6 +11,10 @@ plugins {
     id 'java-library'
 }
 
+ext {
+    version = '0.3.0'
+}
+
 repositories {
     jcenter()
 }
