@@ -10,7 +10,7 @@ import java.util.List;
 
 import net.dathoang.cqrs.commandbus.message.Message;
 import net.dathoang.cqrs.commandbus.middleware.Middleware;
-import net.dathoang.cqrs.commandbus.middleware.NextFunction;
+import net.dathoang.cqrs.commandbus.middleware.NextMiddlewareFunction;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -63,7 +63,7 @@ class DefaultCommandBusTest {
 
   static class DummyMiddleware implements Middleware {
     @Override
-    public <R> R handle(Message<R> message, NextFunction<Message<R>, R> next) throws Exception {
+    public <R> R handle(Message<R> message, NextMiddlewareFunction<Message<R>, R> next) throws Exception {
       return next.call(message);
     }
   }

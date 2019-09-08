@@ -1,35 +1,31 @@
 package net.dathoang.cqrs.commandbus.spring;
 
 import net.dathoang.cqrs.commandbus.autoscan.AutoScanHandlerFactory;
+import net.dathoang.cqrs.commandbus.autoscan.BeanFactory;
 import net.dathoang.cqrs.commandbus.autoscan.HandlerScan;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 import java.util.*;
-import java.util.function.Function;
 
 public class SpringAutoScanHandlerFactory extends AutoScanHandlerFactory {
 
-  private final ApplicationContext context;
+  private ApplicationContext context;
 
   public SpringAutoScanHandlerFactory(ApplicationContext context) {
+    super(new BeanFactory() {
+      @Override
+      public <R> R createBean(Class<R> beanClass) {
+        context.getAutowireCapableBeanFactory().autowireBean(beanClass);
+        return context.getAutowireCapableBeanFactory().createBean(beanClass);
+      }
+    });
     this.context = context;
 
-    this.startScanningHandler();
+    Set<String> packagesToScan = getPackagesToScanConfig();
+    packagesToScan.forEach(this::scanAndRegisterHandlers);
   }
 
-  @SuppressWarnings("unchecked")
-  @Override
-  protected Function<Class, Object> getBeanFactory() {
-    return (cls) -> {
-      context.getAutowireCapableBeanFactory().autowireBean(cls);
-      return context.getAutowireCapableBeanFactory().createBean(cls);
-    };
-  }
-
-  @Override
-  protected Set<String> getPackagesToScanConfig() {
+  private Set<String> getPackagesToScanConfig() {
     Set<String> packagesToScan = new HashSet<>();
     Map<String, Object> springApplicationInstances = context.getBeansWithAnnotation(HandlerScan.class);
     for (Object appInstance : springApplicationInstances.values()) {
