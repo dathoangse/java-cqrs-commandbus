@@ -1,7 +1,7 @@
 # Java CQRS CommandBus
 [![Build Status](https://travis-ci.com/dathoangse/java-cqrs-commandbus.svg?branch=develop)](https://travis-ci.com/dathoangse/java-cqrs-commandbus)
 [![codecov](https://codecov.io/gh/dathoangse/java-cqrs-commandbus/branch/develop/graph/badge.svg)](https://codecov.io/gh/dathoangse/java-cqrs-commandbus)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/core/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/commandbus-spec)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.dathoang.cqrs.commandbus/commandbus-core-full/badge.svg)](https://mvnrepository.com/artifact/net.dathoang.cqrs.commandbus/commandbus-spec)
 
 A lightweight & highly extensible CQRS framework for implementing application layer and CQRS architectural pattern in Java.
 
@@ -28,7 +28,7 @@ The project follows [Google Java Style Guide](https://google.github.io/styleguid
 ## Git workflow
 Before v0.3.0, the project uses [Gitflow](https://nvie.com/posts/a-successful-git-branching-model/).
 
-From v0.3.0, the project uses [Trunk-based development](https://trunkbaseddevelopment.com/), and **develop** branch will be used as trunk (instead of **master**)
+From v0.3.0, the project uses [Trunk-based development](https://trunkbaseddevelopment.com/), and **master** branch will be used as trunk.
 
 ## Versioning
 The project uses [SemVer v2.0.0](https://semver.org/).
