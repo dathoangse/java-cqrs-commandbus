@@ -28,7 +28,7 @@ public class CommandBusSpringConfiguration {
   public CommandBus getCommandBus() {
     return new DefaultCommandBus(
         findHandlerFactoryConfig().getCommandHandlerFactory(),
-        findMiddlewareConfig().getQueryMiddlewarePipeline()
+        findMiddlewareConfig().getCommandMiddlewarePipeline()
     );
   }
 
